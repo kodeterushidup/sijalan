@@ -29,14 +29,14 @@ Tracker ini adalah daftar kerja tunggal saat implementasi. Sumber kebenaran kebu
 
 ## E0 — Fondasi teknis
 
-- [ ] **E0-01** Pasang dependency: `@inertiajs/react`, `react`, `react-dom`, `@vitejs/plugin-react`, `typescript`, tipe React.
-- [ ] **E0-02** Konfigurasi `vite.config.js` (plugin React + alias `@`), `tsconfig.json`, dan `resources/js/app.tsx`.
-- [ ] **E0-03** Middleware Inertia (`HandleInertiaRequests`), root view `app.blade.php`, dan shared props `auth.user`, `flash`.
-- [ ] **E0-04** Layout aplikasi: sidebar navigasi per peran, topbar (nama, peran, logout), halaman error 403/404.
-- [ ] **E0-05** Set timezone `Asia/Jakarta`, locale `id`, format tanggal `d F Y`, dan helper rupiah.
-- [ ] **E0-06** Enum `Role` (`SuperAdmin`, `Admin`, `Pejabat`, `Pegawai`) dan `TripStatus` (`Draft`, `Diajukan`, `Disetujui`, `Ditolak`, `Berlangsung`, `Selesai`, `Dibatalkan`) + label Bahasa Indonesia.
-- [ ] **E0-07** Seeder akun demo: 1 super admin, 1 admin, 1 pejabat, 3 pegawai (kredensial dicatat di README).
-- [ ] **E0-08** Test dasar: halaman login tampil, tamu dialihkan ke login.
+- [x] **E0-01** Pasang dependency: `@inertiajs/react`, `react`, `react-dom`, `@vitejs/plugin-react`, `typescript`, tipe React.
+- [x] **E0-02** Konfigurasi `vite.config.js` (plugin React + alias `@`), `tsconfig.json`, dan `resources/js/app.tsx`.
+- [x] **E0-03** Middleware Inertia (`HandleInertiaRequests`), root view `app.blade.php`, dan shared props `auth.user`, `flash`.
+- [x] **E0-04** Layout aplikasi: sidebar navigasi per peran, topbar (nama, peran, logout), halaman error 403/404.
+- [x] **E0-05** Set timezone `Asia/Jakarta`, locale `id`, format tanggal `d F Y`, dan helper rupiah.
+- [x] **E0-06** Enum `Role` (`SuperAdmin`, `Admin`, `Pejabat`, `Pegawai`) dan `TripStatus` (`Draft`, `Diajukan`, `Disetujui`, `Ditolak`, `Berlangsung`, `Selesai`, `Dibatalkan`) + label Bahasa Indonesia.
+- [x] **E0-07** Seeder akun demo: 1 super admin, 1 admin, 1 pejabat, 3 pegawai (kredensial dicatat di README).
+- [x] **E0-08** Test dasar: halaman login tampil, tamu dialihkan ke login.
 
 **Gate E0**: `npm run build` sukses, login demo berhasil, layout tampil di 360 px.
 
@@ -160,4 +160,4 @@ Tracker ini adalah daftar kerja tunggal saat implementasi. Sumber kebenaran kebu
 
 | Tanggal | Task | Catatan |
 |---|---|---|
-| — | — | Belum ada implementasi dimulai |
+| 10 Nov 2026 | E0-01..E0-08 | Fondasi Inertia + React + TS, layout, enum, auth dasar, seeder akun. Lulus build, tsc, 9 test. |

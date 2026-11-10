@@ -8,6 +8,7 @@
 | **Status** | Disetujui untuk implementasi MVP |
 | **Glosarium** | [`CONTEXT.md`](../CONTEXT.md) |
 | **Keputusan arsitektur** | [`docs/adr/`](adr/) |
+| **Task tracker** | [`docs/TASKS.md`](TASKS.md) |
 
 ---
 
@@ -236,6 +237,8 @@ Catatan: data pegawai disimpan pada `users` (bukan tabel `employees` terpisah) a
 
 ## 8. Aturan Non-Fungsional
 
+- **Stack**: Laravel 13 (PHP 8.4) + Inertia.js 2 + React 19 + TypeScript + Vite + Tailwind 4. Tidak ada REST API terpisah dan tidak memakai starter kit autentikasi; autentikasi dibangun sendiri dengan controller + halaman Inertia. `npm run build` wajib dijalankan setelah perubahan frontend.
+- **Rendering**: SPA shell Inertia tanpa SSR; halaman cetak SPPD/laporan tetap HTML + CSS print.
 - **Bahasa**: seluruh antarmuka Bahasa Indonesia; label tanggal `d F Y` (contoh: 10 November 2026).
 - **Responsif**: nyaman dipakai pada 360 px hingga desktop; kalender dapat digeser horizontal di ponsel.
 - **Kinerja**: halaman biasa < 300 ms pada data 300 pegawai / 2.000 perjalanan; index pada `trips(user_id, tanggal_mulai)`, `trips(status)`, `trip_photos(trip_id)`.
@@ -275,7 +278,7 @@ Urutan pengerjaan mengikuti tabel di atas; setiap epic disertai feature test (st
 
 | Risiko / Asumsi | Mitigasi |
 |---|---|
-| Format SPPD berbeda tiap instansi | Kop & format nomor dapat diubah di Pengaturan; template Blade mudah disesuaikan |
+| Format SPPD berbeda tiap instansi | Kop & format nomor dapat diubah di Pengaturan; template halaman cetak (React/TSX) mudah disesuaikan |
 | Cetak PDF bergantung browser | CSS print A4 diuji di Chrome/Edge; pengguna diarahkan "Simpan sebagai PDF" |
 | Scheduler tidak berjalan di lokal | Dokumentasi menjalankan `php artisan schedule:work`; status tetap dapat diverifikasi manual lewat tanggal |
 | SPPD rombongan belum didukung | Dicatat sebagai future work; sementara dibuat satu perjalanan per pegawai |

@@ -19,7 +19,34 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->ensureStorageDirectoriesExist();
         $this->ensureSqliteDatabaseExists();
+    }
+
+    /**
+     * Create the writable storage directories a fresh persistent volume lacks.
+     *
+     * When a volume is mounted on `storage/`, the packaged directory contents are
+     * hidden. Blade, the session driver and the log writer need these paths.
+     */
+    protected function ensureStorageDirectoriesExist(): void
+    {
+        $directories = [
+            'app/public',
+            'framework/cache/data',
+            'framework/sessions',
+            'framework/testing',
+            'framework/views',
+            'logs',
+        ];
+
+        foreach ($directories as $directory) {
+            $path = storage_path($directory);
+
+            if (! is_dir($path)) {
+                mkdir($path, 0775, true);
+            }
+        }
     }
 
     /**

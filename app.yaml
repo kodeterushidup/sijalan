@@ -1,74 +1,63 @@
 kind: wasmer.io/App.v0
-owner: frenkiherlambang
 name: sijalan
+owner: frenkiherlambang
 package: .
-description: SIJALAN - Sistem Informasi Perjalanan Dinas
-debug: false
-
+locality:
+  regions:
+    - fr-roub1
 env:
   APP_NAME: SIJALAN
   APP_ENV: production
-  APP_DEBUG: "false"
-  APP_URL: https://sijalan-frenkiherlambang.wasmer.app
+  APP_DEBUG: 'false'
+  APP_URL: https://sijalan.wasmer.app
   APP_LOCALE: id
   APP_FALLBACK_LOCALE: en
   APP_FAKER_LOCALE: id_ID
   APP_TIMEZONE: Asia/Jakarta
   APP_MAINTENANCE_DRIVER: file
-  BCRYPT_ROUNDS: "12"
-
+  BCRYPT_ROUNDS: '12'
   LOG_CHANNEL: stderr
   LOG_LEVEL: warning
-
-  # No managed database: SQLite lives on the persistent volume below.
   DB_CONNECTION: sqlite
   DB_DATABASE: /app/storage/database.sqlite
-
   SESSION_DRIVER: database
-  SESSION_LIFETIME: "120"
-  SESSION_ENCRYPT: "false"
+  SESSION_LIFETIME: '120'
+  SESSION_ENCRYPT: 'false'
   SESSION_PATH: /
   CACHE_STORE: database
   QUEUE_CONNECTION: sync
   FILESYSTEM_DISK: local
   BROADCAST_CONNECTION: log
   MAIL_MAILER: log
-  INERTIA_SSR_ENABLED: "false"
-
-volumes:
-  - name: data
-    mount: /app/storage
-
-scaling:
-  mode: single_concurrency
-
-locality:
-  regions:
-    - us-losa1
-
+  INERTIA_SSR_ENABLED: 'false'
 capabilities:
   instaboot:
+    mode: null
     requests:
-      - path: /up
-
+    - path: /up
+volumes:
+- name: data
+  mount: /app/storage
 health_checks:
-  - http:
-      method: get
-      path: /up
-      interval: 30s
-      timeout: 10s
-      unhealthy_threshold: 3
-      healthy_threshold: 1
-      expected_status_codes:
-        - 200
-
+- !http
+  path: /up
+  method: get
+  timeout: 10s
+  interval: 30s
+  unhealthy_threshold: 3
+  healthy_threshold: 1
+debug: true
+scaling:
+  mode: single_concurrency
 jobs:
-  - name: migrate
-    trigger: pre-deployment
-    timeout: 10m
-    action:
-      execute:
-        command: artisan
-        cli_args:
-          - migrate
-          - --force
+- name: migrate
+  trigger: pre-deployment
+  timeout: 10m
+  action:
+    execute:
+      command: artisan
+      cli_args:
+      - migrate
+      - --force
+description: SIJALAN - Sistem Informasi Perjalanan Dinas
+app_id: da_2J7IAtxUdEXa

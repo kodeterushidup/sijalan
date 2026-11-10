@@ -9,6 +9,7 @@
 # Heavy or unnecessary files.
 node_modules
 .git
+public/storage
 .agents
 .claude
 .pi

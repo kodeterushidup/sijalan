@@ -85,14 +85,14 @@ Tracker ini adalah daftar kerja tunggal saat implementasi. Sumber kebenaran kebu
 
 ## E4 — Persetujuan, penomoran, SPPD
 
-- [ ] **E4-01** Halaman antrean persetujuan (Diajukan, terlama dulu) + detail singkat.
-- [ ] **E4-02** Aksi setujui: transaksi DB, status `Disetujui`, isi `disetujui_oleh`/`disetujui_at`.
-- [ ] **E4-03** Service penomoran SPPD: format placeholder, urut 3 digit per unit per tahun, unik `(tahun, unit_id, nomor_urut)`.
-- [ ] **E4-04** Aksi tolak wajib alasan (maks 500), status `Ditolak`, ajukan ulang setelah diperbaiki.
-- [ ] **E4-05** Halaman cetak SPPD (A4, CSS print): kop, nomor, data pegawai, tujuan, tanggal, angkut, sumber dana, rincian biaya + total, TTD pejabat.
-- [ ] **E4-06** Tombol "Cetak / Simpan PDF" memanggil `window.print()`; nomor tidak bisa diedit.
-- [ ] **E4-07** Guard: halaman SPPD hanya untuk status `Disetujui` ke atas; akses per peran/pemilik.
-- [ ] **E4-08** Test: nomor terbit sekali & tidak dipakai ulang saat batal, penolakan tanpa alasan gagal, pegawai tidak bisa menyetujui.
+- [x] **E4-01** Halaman antrean persetujuan (Diajukan, terlama dulu) + detail singkat.
+- [x] **E4-02** Aksi setujui: transaksi DB, status `Disetujui`, isi `disetujui_oleh`/`disetujui_at`.
+- [x] **E4-03** Service penomoran SPPD: format placeholder, urut 3 digit per unit per tahun, unik `(tahun, unit_id, nomor_urut)`.
+- [x] **E4-04** Aksi tolak wajib alasan (maks 500), status `Ditolak`, ajukan ulang setelah diperbaiki.
+- [x] **E4-05** Halaman cetak SPPD (A4, CSS print): kop, nomor, data pegawai, tujuan, tanggal, angkut, sumber dana, rincian biaya + total, TTD pejabat.
+- [x] **E4-06** Tombol "Cetak / Simpan PDF" memanggil `window.print()`; nomor tidak bisa diedit.
+- [x] **E4-07** Guard: halaman SPPD hanya untuk status `Disetujui` ke atas; akses per peran/pemilik.
+- [x] **E4-08** Test: nomor terbit sekali & tidak dipakai ulang saat batal, penolakan tanpa alasan gagal, pegawai tidak bisa menyetujui.
 
 **Gate E4**: Approve → nomor `090/SPPD/001/.../2026` tampil dan cetak SPPD rapi di Chrome (1 halaman).
 
@@ -164,3 +164,4 @@ Tracker ini adalah daftar kerja tunggal saat implementasi. Sumber kebenaran kebu
 | 10 Nov 2026 | E1-01..E1-08 | Peran via middleware, profil + TTD privat, CRUD akun Super Admin. 19 test hijau. |
 | 10 Nov 2026 | E2-01..E2-08 | CRUD unit + proteksi relasi, CRUD pegawai + impor CSV, pengaturan instansi + logo. 37 test hijau. |
 | 10 Nov 2026 | E3-01..E3-12 | CRUD perjalanan + rincian biaya, validasi bentrok jadwal, guard transisi, pembatalan, detail + riwayat. 52 test hijau. |
+| 10 Nov 2026 | E4-01..E4-08 | Antrean persetujuan Pejabat, setujui/tolak, penomoran SPPD per unit/tahun tanpa reuse, halaman cetak SPPD. 60 test hijau. |

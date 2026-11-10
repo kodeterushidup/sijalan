@@ -46,4 +46,14 @@ class TripPolicy
     {
         return $user->role->canManageData() && $trip->status === TripStatus::Draft;
     }
+
+    public function approve(User $user, Trip $trip): bool
+    {
+        return $user->role->isApprover() && $trip->status === TripStatus::Diajukan;
+    }
+
+    public function reject(User $user, Trip $trip): bool
+    {
+        return $user->role->isApprover() && $trip->status === TripStatus::Diajukan;
+    }
 }

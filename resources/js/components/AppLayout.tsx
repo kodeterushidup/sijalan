@@ -26,6 +26,7 @@ const navByRole: Record<Role, NavItem[]> = {
     ],
     pejabat: [
         { label: 'Ringkasan', href: '/' },
+        { label: 'Persetujuan', href: '/persetujuan' },
         { label: 'Perjalanan', href: '/perjalanan' },
         { label: 'Profil', href: '/profil' },
     ],

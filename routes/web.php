@@ -6,6 +6,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\SppdController;
+use App\Http\Controllers\TripApprovalController;
 use App\Http\Controllers\TripController;
 use App\Http\Controllers\UnitController;
 use Illuminate\Support\Facades\Route;
@@ -49,6 +51,12 @@ Route::middleware('auth')->group(function (): void {
 
     Route::get('/perjalanan', [TripController::class, 'index'])->name('trips.index');
 
+    Route::middleware('role:pejabat')->group(function (): void {
+        Route::get('/persetujuan', [TripApprovalController::class, 'index'])->name('approvals.index');
+        Route::post('/perjalanan/{trip}/setujui', [TripApprovalController::class, 'approve'])->name('approvals.approve');
+        Route::post('/perjalanan/{trip}/tolak', [TripApprovalController::class, 'reject'])->name('approvals.reject');
+    });
+
     Route::middleware('role:super_admin,admin')->group(function (): void {
         Route::get('/perjalanan/baru', [TripController::class, 'create'])->name('trips.create');
         Route::post('/perjalanan', [TripController::class, 'store'])->name('trips.store');
@@ -60,6 +68,7 @@ Route::middleware('auth')->group(function (): void {
     });
 
     Route::get('/perjalanan/{trip}', [TripController::class, 'show'])->name('trips.show');
+    Route::get('/perjalanan/{trip}/sppd', [SppdController::class, 'show'])->name('trips.sppd');
 
     Route::middleware('role:super_admin')->group(function (): void {
         Route::get('/akun', [AccountController::class, 'index'])->name('accounts.index');

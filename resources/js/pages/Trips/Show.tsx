@@ -56,12 +56,33 @@ type Actions = {
     canDelete: boolean;
     canSubmit: boolean;
     canCancel: boolean;
+    canApprove: boolean;
+    canReject: boolean;
+    canPrintSppd: boolean;
 };
 
 export default function TripsShow({ trip, actions }: { trip: Trip; actions: Actions }) {
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [showCancel, setShowCancel] = useState(false);
+    const [showReject, setShowReject] = useState(false);
     const cancelForm = useForm({ alasan_pembatalan: '' });
+    const rejectForm = useForm({ alasan_penolakan: '' });
+    const rejectStatusError = (rejectForm.errors as Partial<Record<string, string>>).status;
+
+    function approve() {
+        router.post(`/perjalanan/${trip.id}/setujui`, {}, { preserveScroll: true });
+    }
+
+    function reject(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+        rejectForm.post(`/perjalanan/${trip.id}/tolak`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                rejectForm.reset();
+                setShowReject(false);
+            },
+        });
+    }
 
     function submitTrip() {
         router.post(`/perjalanan/${trip.id}/ajukan`, {}, { preserveScroll: true });
@@ -99,6 +120,27 @@ export default function TripsShow({ trip, actions }: { trip: Trip; actions: Acti
                 description={`${trip.pegawai.name} · ${trip.unit}`}
                 actions={
                     <>
+                        {actions.canPrintSppd ? (
+                            <Link href={`/perjalanan/${trip.id}/sppd`} className={btnSecondary}>
+                                Cetak SPPD
+                            </Link>
+                        ) : null}
+                        {actions.canApprove ? (
+                            <button type="button" onClick={approve} className={btnPrimary}>
+                                Setujui
+                            </button>
+                        ) : null}
+                        {actions.canReject ? (
+                            <button
+                                type="button"
+                                onClick={() => setShowReject((open) => !open)}
+                                className={btnDanger}
+                                aria-expanded={showReject}
+                                aria-controls="form-penolakan"
+                            >
+                                Tolak
+                            </button>
+                        ) : null}
                         {actions.canSubmit ? (
                             <button type="button" onClick={submitTrip} className={btnPrimary}>
                                 Ajukan ke pejabat
@@ -143,6 +185,39 @@ export default function TripsShow({ trip, actions }: { trip: Trip; actions: Acti
                     <p className="font-semibold text-ink">Alasan pembatalan</p>
                     <p className="mt-1">{trip.alasan_pembatalan}</p>
                 </div>
+            ) : null}
+
+            {showReject ? (
+                <form id="form-penolakan" onSubmit={reject} className={`${cardClass} mb-4 p-4`}>
+                    <label htmlFor="alasan_penolakan" className={labelClass}>
+                        Alasan penolakan
+                    </label>
+                    <p className="mb-2 mt-1 text-sm text-muted">
+                        Alasan akan terlihat oleh Admin Kepegawaian yang dapat memperbaiki lalu mengajukan ulang.
+                    </p>
+                    <textarea
+                        id="alasan_penolakan"
+                        rows={3}
+                        value={rejectForm.data.alasan_penolakan}
+                        onChange={(event) => rejectForm.setData('alasan_penolakan', event.target.value)}
+                        className={`${inputClass} min-h-24`}
+                        required
+                    />
+                    {rejectForm.errors.alasan_penolakan ? (
+                        <p className={errorClass} role="alert">{rejectForm.errors.alasan_penolakan}</p>
+                    ) : null}
+                    {rejectStatusError ? (
+                        <p className={errorClass} role="alert">{rejectStatusError}</p>
+                    ) : null}
+                    <div className="mt-3 flex flex-wrap gap-2">
+                        <button type="submit" disabled={rejectForm.processing} className={btnDanger}>
+                            {rejectForm.processing ? 'Menolak...' : 'Konfirmasi penolakan'}
+                        </button>
+                        <button type="button" onClick={() => setShowReject(false)} className={btnSecondary}>
+                            Tidak jadi
+                        </button>
+                    </div>
+                </form>
             ) : null}
 
             {showCancel ? (

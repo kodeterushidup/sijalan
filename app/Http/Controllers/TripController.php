@@ -197,6 +197,13 @@ class TripController extends Controller
                     TripStatus::Disetujui,
                     TripStatus::Berlangsung,
                 ], true),
+                'canApprove' => $user->role->isApprover() && $trip->status === TripStatus::Diajukan,
+                'canReject' => $user->role->isApprover() && $trip->status === TripStatus::Diajukan,
+                'canPrintSppd' => in_array($trip->status, [
+                    TripStatus::Disetujui,
+                    TripStatus::Berlangsung,
+                    TripStatus::Selesai,
+                ], true),
             ],
         ]);
     }

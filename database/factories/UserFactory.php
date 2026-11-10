@@ -71,10 +71,10 @@ class UserFactory extends Factory
         return $this->state(fn (): array => ['is_active' => false]);
     }
 
-    public function withUnit(Unit $unit): static
+    public function withUnit(?Unit $unit = null): static
     {
         return $this->state(fn (): array => [
-            'unit_id' => $unit->id,
+            'unit_id' => $unit?->id ?? Unit::factory(),
         ]);
     }
 }

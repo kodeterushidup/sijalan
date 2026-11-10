@@ -10,11 +10,16 @@ type NavItem = {
 const navByRole: Record<Role, NavItem[]> = {
     super_admin: [
         { label: 'Ringkasan', href: '/' },
+        { label: 'Pegawai', href: '/pegawai' },
+        { label: 'Unit kerja', href: '/unit' },
         { label: 'Akun', href: '/akun' },
+        { label: 'Pengaturan', href: '/pengaturan' },
         { label: 'Profil', href: '/profil' },
     ],
     admin: [
         { label: 'Ringkasan', href: '/' },
+        { label: 'Pegawai', href: '/pegawai' },
+        { label: 'Unit kerja', href: '/unit' },
         { label: 'Profil', href: '/profil' },
     ],
     pejabat: [

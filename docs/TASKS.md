@@ -55,14 +55,14 @@ Tracker ini adalah daftar kerja tunggal saat implementasi. Sumber kebenaran kebu
 
 ## E2 — Master data & pengaturan
 
-- [ ] **E2-01** Migrasi + model + factory `units` (kode unik, nama).
-- [ ] **E2-02** CRUD Unit Kerja (index, form, hapus dengan proteksi relasi).
-- [ ] **E2-03** Migrasi kolom kepegawaian pada `users` (nip, jabatan, golongan, unit_id, no_hp, ttd_path, is_active).
-- [ ] **E2-04** CRUD Pegawai: NIP 18 digit unik, email unik, password awal, unit wajib.
-- [ ] **E2-05** Daftar pegawai: pencarian nama/NIP, filter unit, pagination 15.
-- [ ] **E2-06** Import CSV pegawai + laporan baris gagal (nip, nama, jabatan, golongan, kode_unit, email).
-- [ ] **E2-07** Migrasi + halaman Pengaturan instansi (nama, alamat, logo, format nomor, pejabat default).
-- [ ] **E2-08** Test: validasi NIP/email unik, import sukses & gagal sebagian, akses pengaturan hanya Super Admin.
+- [x] **E2-01** Migrasi + model + factory `units` (kode unik, nama).
+- [x] **E2-02** CRUD Unit Kerja (index, form, hapus dengan proteksi relasi).
+- [x] **E2-03** Migrasi kolom kepegawaian pada `users` (nip, jabatan, golongan, unit_id, no_hp, ttd_path, is_active).
+- [x] **E2-04** CRUD Pegawai: NIP 18 digit unik, email unik, password awal, unit wajib.
+- [x] **E2-05** Daftar pegawai: pencarian nama/NIP, filter unit, pagination 15.
+- [x] **E2-06** Import CSV pegawai + laporan baris gagal (nip, nama, jabatan, golongan, kode_unit, email).
+- [x] **E2-07** Migrasi + halaman Pengaturan instansi (nama, alamat, logo, format nomor, pejabat default).
+- [x] **E2-08** Test: validasi NIP/email unik, import sukses & gagal sebagian, akses pengaturan hanya Super Admin.
 
 **Gate E2**: Admin dapat menyiapkan 1 unit + 3 pegawai dari UI tanpa seed tambahan.
 
@@ -162,3 +162,4 @@ Tracker ini adalah daftar kerja tunggal saat implementasi. Sumber kebenaran kebu
 |---|---|---|
 | 10 Nov 2026 | E0-01..E0-08 | Fondasi Inertia + React + TS, layout, enum, auth dasar, seeder akun. Lulus build, tsc, 9 test. |
 | 10 Nov 2026 | E1-01..E1-08 | Peran via middleware, profil + TTD privat, CRUD akun Super Admin. 19 test hijau. |
+| 10 Nov 2026 | E2-01..E2-08 | CRUD unit + proteksi relasi, CRUD pegawai + impor CSV, pengaturan instansi + logo. 37 test hijau. |

@@ -37,5 +37,6 @@ export type SharedPageProps = {
     flash: {
         success: string | null;
         error: string | null;
+        import_errors: string[];
     };
 };

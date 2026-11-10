@@ -27,12 +27,19 @@ type UpcomingTrip = {
     status_label: string;
 };
 
+type UnitTotal = {
+    nama: string;
+    total: number;
+};
+
 export default function Dashboard({
     stats,
     upcoming,
+    unitChart,
 }: {
     stats: Stats;
     upcoming: UpcomingTrip[];
+    unitChart: UnitTotal[];
 }) {
     const { auth } = usePage<SharedPageProps>().props;
     const user = auth.user;
@@ -63,6 +70,8 @@ export default function Dashboard({
         year: 'numeric',
     }).format(new Date());
 
+    const maxUnitTotal = Math.max(1, ...unitChart.map((unit) => unit.total));
+
     return (
         <AppLayout>
             <Head title="Ringkasan" />
@@ -85,6 +94,35 @@ export default function Dashboard({
                     ))}
                 </dl>
             </div>
+
+            {unitChart.length > 0 ? (
+                <section className="mt-8">
+                    <h2 className="mb-3 font-display text-2xl text-ink">Perjalanan per unit, 6 bulan terakhir</h2>
+                    <ul className={`${cardClass} space-y-4 p-5`}>
+                        {unitChart.map((unit) => (
+                            <li key={unit.nama}>
+                                <div className="flex items-baseline justify-between gap-4 text-sm">
+                                    <span className="text-ink">{unit.nama}</span>
+                                    <span className="font-semibold text-ink">{unit.total}</span>
+                                </div>
+                                <div
+                                    className="mt-1.5 h-2 overflow-hidden rounded-sm bg-paper"
+                                    role="progressbar"
+                                    aria-label={`${unit.nama}: ${unit.total} perjalanan`}
+                                    aria-valuenow={unit.total}
+                                    aria-valuemin={0}
+                                    aria-valuemax={maxUnitTotal}
+                                >
+                                    <div
+                                        className="h-full rounded-sm bg-accent"
+                                        style={{ width: `${Math.round((unit.total / maxUnitTotal) * 100)}%` }}
+                                    />
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                </section>
+            ) : null}
 
             <section className="mt-8">
                 <h2 className="mb-3 font-display text-2xl text-ink">Perjalanan terdekat</h2>

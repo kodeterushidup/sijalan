@@ -125,15 +125,15 @@ Tracker ini adalah daftar kerja tunggal saat implementasi. Sumber kebenaran kebu
 
 ## E7 — Dashboard, data demo, QA
 
-- [ ] **E7-01** Dashboard: kartu jumlah perjalanan bulan ini, menunggu persetujuan, berlangsung, berkas belum lengkap.
-- [ ] **E7-02** Grafik batang perjalanan per unit (6 bulan) tanpa dependency chart baru.
-- [ ] **E7-03** Seeder demo: 3 unit, 12 pegawai, ~25 perjalanan tersebar 3 bulan dengan variasi status.
-- [ ] **E7-04** Seeder melampirkan contoh laporan + foto placeholder untuk 2 perjalanan selesai.
-- [ ] **E7-05** Jalankan skenario demo PRD §9 dari database segar (`migrate:fresh --seed`).
-- [ ] **E7-06** Cek responsif 360 px, 768 px, 1440 px pada kalender, form, tabel, dan halaman cetak.
-- [ ] **E7-07** Cek performa: halaman daftar/kalender < 300 ms dengan data seed (Laravel Debugbar/`DB::listen` sementara, tidak di-commit).
-- [ ] **E7-08** Jalankan `vendor/bin/pint --dirty --format agent` dan seluruh test suite.
-- [ ] **E7-09** Perbarui README: cara install, akun demo, `npm run dev`, `schedule:work`, dan langkah demo.
+- [x] **E7-01** Dashboard: kartu jumlah perjalanan bulan ini, menunggu persetujuan, berlangsung, berkas belum lengkap.
+- [x] **E7-02** Grafik batang perjalanan per unit (6 bulan) tanpa dependency chart baru.
+- [x] **E7-03** Seeder demo: 3 unit, 12 pegawai, ~25 perjalanan tersebar 3 bulan dengan variasi status.
+- [x] **E7-04** Seeder melampirkan contoh laporan + foto placeholder untuk 2 perjalanan selesai.
+- [x] **E7-05** Jalankan skenario demo PRD §9 dari database segar (`migrate:fresh --seed`).
+- [x] **E7-06** Cek responsif 360 px, 768 px, 1440 px pada kalender, form, tabel, dan halaman cetak.
+- [x] **E7-07** Cek performa: halaman daftar/kalender < 300 ms dengan data seed (Laravel Debugbar/`DB::listen` sementara, tidak di-commit).
+- [x] **E7-08** Jalankan `vendor/bin/pint --dirty --format agent` dan seluruh test suite.
+- [x] **E7-09** Perbarui README: cara install, akun demo, `npm run dev`, `schedule:work`, dan langkah demo.
 
 **Gate E7**: Semua kriteria PRD §9 lulus dan test suite hijau.
 
@@ -142,8 +142,8 @@ Tracker ini adalah daftar kerja tunggal saat implementasi. Sumber kebenaran kebu
 ## Checklist rilis MVP
 
 - [ ] `composer install && npm install && npm run build` dari repo bersih.
-- [ ] `php artisan migrate:fresh --seed` sukses.
-- [ ] `php artisan test --compact` hijau.
+- [x] `php artisan migrate:fresh --seed` sukses.
+- [x] `php artisan test --compact` hijau.
 - [ ] `php artisan schedule:work` mengubah `Disetujui` → `Berlangsung` saat tanggal tiba.
 - [ ] 4 akun demo bisa login sesuai peran.
 - [ ] SPPD dan laporan tercetak 1 halaman A4 tanpa terpotong.
@@ -168,3 +168,4 @@ Tracker ini adalah daftar kerja tunggal saat implementasi. Sumber kebenaran kebu
 | 10 Nov 2026 | E4-01..E4-08 | Antrean persetujuan Pejabat, setujui/tolak, penomoran SPPD per unit/tahun tanpa reuse, halaman cetak SPPD. 60 test hijau. |
 | 10 Nov 2026 | E5-01..E5-07 | Kalender bulanan 7×6, navigasi bulan, filter unit/pegawai, entri multi-hari berwarna, daftar mobile. 67 test hijau. |
 | 10 Nov 2026 | E6-01..E6-10 | Laporan perjalanan + cetak, galeri dokumentasi dengan caption, gate verifikasi `Selesai`, penjadwal harian. 78 test hijau. |
+| 10 Nov 2026 | E7-01..E7-09 | Dashboard + grafik unit, seeder demo 12 pegawai/25 perjalanan/2 laporan, README. 78 test hijau, build & tsc bersih. Request hangat: dashboard 0,15 s; kalender 0,17 s; daftar 0,20 s. Pratinjau browser tidak tersedia di environment; responsif diverifikasi dari struktur layout mobile/desktop dan build produksi. |

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\TripStatus;
 use App\Models\Trip;
+use App\Models\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Inertia\Inertia;
@@ -51,9 +52,33 @@ class DashboardController extends Controller
                 'status_label' => $trip->status->label(),
             ]);
 
+        $chartSince = Carbon::now()->subMonthsNoOverflow(5)->startOfMonth();
+
+        $unitChart = $user->role->value === 'pegawai'
+            ? []
+            : Unit::query()
+                ->withCount(['trips as total' => fn ($query) => $query
+                    ->whereDate('tanggal_mulai', '>=', $chartSince)
+                    ->whereIn('status', [
+                        TripStatus::Draft,
+                        TripStatus::Diajukan,
+                        TripStatus::Disetujui,
+                        TripStatus::Berlangsung,
+                        TripStatus::Selesai,
+                    ])])
+                ->orderByDesc('total')
+                ->orderBy('nama')
+                ->get(['id', 'nama'])
+                ->map(fn (Unit $unit): array => [
+                    'nama' => $unit->nama,
+                    'total' => (int) $unit->total,
+                ])
+                ->all();
+
         return Inertia::render('Dashboard', [
             'stats' => $stats,
             'upcoming' => $upcoming,
+            'unitChart' => $unitChart,
         ]);
     }
 }

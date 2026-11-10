@@ -46,5 +46,7 @@ class DatabaseSeeder extends Seeder
             'role' => Role::Pegawai,
             'unit_id' => $bidangB->id,
         ]);
+
+        $this->call(DemoSeeder::class);
     }
 }

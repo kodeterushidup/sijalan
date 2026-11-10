@@ -42,14 +42,14 @@ Tracker ini adalah daftar kerja tunggal saat implementasi. Sumber kebenaran kebu
 
 ## E1 — Autentikasi, peran, profil
 
-- [ ] **E1-01** Halaman login Inertia + `LoginController` (email/password, remember me, rate limit).
-- [ ] **E1-02** Logout dan regenerasi session.
-- [ ] **E1-03** Tolak akun nonaktif (`is_active = false`) dengan pesan jelas.
-- [ ] **E1-04** Middleware/policy per peran (`role:admin`, `role:pejabat`, dst.) dan redirect 403.
-- [ ] **E1-05** CRUD akun oleh Super Admin: buat, ubah peran, nonaktifkan; tanpa registrasi publik.
-- [ ] **E1-06** Profil: ubah nama/no. HP, unggah TTD (PNG/JPG maks 1 MB), hapus TTD.
-- [ ] **E1-07** Simpan TTD di disk privat + route penyajian terautentikasi.
-- [ ] **E1-08** Test: login sukses/gagal, akun nonaktif, akses lintas peran ditolak, unggah TTD divalidasi.
+- [x] **E1-01** Halaman login Inertia + `LoginController` (email/password, remember me, rate limit).
+- [x] **E1-02** Logout dan regenerasi session.
+- [x] **E1-03** Tolak akun nonaktif (`is_active = false`) dengan pesan jelas.
+- [x] **E1-04** Middleware/policy per peran (`role:admin`, `role:pejabat`, dst.) dan redirect 403.
+- [x] **E1-05** CRUD akun oleh Super Admin: buat, ubah peran, nonaktifkan; tanpa registrasi publik.
+- [x] **E1-06** Profil: ubah nama/no. HP, unggah TTD (PNG/JPG maks 1 MB), hapus TTD.
+- [x] **E1-07** Simpan TTD di disk privat + route penyajian terautentikasi.
+- [x] **E1-08** Test: login sukses/gagal, akun nonaktif, akses lintas peran ditolak, unggah TTD divalidasi.
 
 **Gate E1**: setiap peran hanya melihat menu yang diizinkan PRD §3.
 
@@ -161,3 +161,4 @@ Tracker ini adalah daftar kerja tunggal saat implementasi. Sumber kebenaran kebu
 | Tanggal | Task | Catatan |
 |---|---|---|
 | 10 Nov 2026 | E0-01..E0-08 | Fondasi Inertia + React + TS, layout, enum, auth dasar, seeder akun. Lulus build, tsc, 9 test. |
+| 10 Nov 2026 | E1-01..E1-08 | Peran via middleware, profil + TTD privat, CRUD akun Super Admin. 19 test hijau. |

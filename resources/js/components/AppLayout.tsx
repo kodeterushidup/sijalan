@@ -8,10 +8,23 @@ type NavItem = {
 };
 
 const navByRole: Record<Role, NavItem[]> = {
-    super_admin: [{ label: 'Ringkasan', href: '/' }],
-    admin: [{ label: 'Ringkasan', href: '/' }],
-    pejabat: [{ label: 'Ringkasan', href: '/' }],
-    pegawai: [{ label: 'Ringkasan', href: '/' }],
+    super_admin: [
+        { label: 'Ringkasan', href: '/' },
+        { label: 'Akun', href: '/akun' },
+        { label: 'Profil', href: '/profil' },
+    ],
+    admin: [
+        { label: 'Ringkasan', href: '/' },
+        { label: 'Profil', href: '/profil' },
+    ],
+    pejabat: [
+        { label: 'Ringkasan', href: '/' },
+        { label: 'Profil', href: '/profil' },
+    ],
+    pegawai: [
+        { label: 'Ringkasan', href: '/' },
+        { label: 'Profil', href: '/profil' },
+    ],
 };
 
 function useActive(href: string): boolean {

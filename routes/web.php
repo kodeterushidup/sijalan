@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\TripController;
 use App\Http\Controllers\UnitController;
 use Illuminate\Support\Facades\Route;
 
@@ -45,6 +46,20 @@ Route::middleware('auth')->group(function (): void {
         Route::get('/pengaturan', [SettingController::class, 'edit'])->name('settings.edit');
         Route::patch('/pengaturan', [SettingController::class, 'update'])->name('settings.update');
     });
+
+    Route::get('/perjalanan', [TripController::class, 'index'])->name('trips.index');
+
+    Route::middleware('role:super_admin,admin')->group(function (): void {
+        Route::get('/perjalanan/baru', [TripController::class, 'create'])->name('trips.create');
+        Route::post('/perjalanan', [TripController::class, 'store'])->name('trips.store');
+        Route::get('/perjalanan/{trip}/edit', [TripController::class, 'edit'])->name('trips.edit');
+        Route::patch('/perjalanan/{trip}', [TripController::class, 'update'])->name('trips.update');
+        Route::delete('/perjalanan/{trip}', [TripController::class, 'destroy'])->name('trips.destroy');
+        Route::post('/perjalanan/{trip}/ajukan', [TripController::class, 'submit'])->name('trips.submit');
+        Route::post('/perjalanan/{trip}/batalkan', [TripController::class, 'cancel'])->name('trips.cancel');
+    });
+
+    Route::get('/perjalanan/{trip}', [TripController::class, 'show'])->name('trips.show');
 
     Route::middleware('role:super_admin')->group(function (): void {
         Route::get('/akun', [AccountController::class, 'index'])->name('accounts.index');

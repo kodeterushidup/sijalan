@@ -68,18 +68,18 @@ Tracker ini adalah daftar kerja tunggal saat implementasi. Sumber kebenaran kebu
 
 ## E3 — Perjalanan Dinas
 
-- [ ] **E3-01** Migrasi `trips` (field PRD §7) + index `(user_id, tanggal_mulai)`, `(status)`.
-- [ ] **E3-02** Migrasi `trip_costs` + model, relasi, dan perhitungan subtotal/total.
-- [ ] **E3-03** Model `Trip` + factory dengan state status (`draft`, `diajukan`, `disetujui`, `berlangsung`, `selesai`, `ditolak`, `dibatalkan`).
-- [ ] **E3-04** Halaman daftar perjalanan: filter status/unit/pegawai/rentang tanggal, kolom status berwarna.
-- [ ] **E3-05** Form create/edit (React): data perjalanan + editor rincian biaya dinamis (tambah/hapus baris, total live).
-- [ ] **E3-06** Validasi server: tanggal selesai ≥ mulai, field wajib, pegawai aktif, pegawai dalam unit yang benar.
-- [ ] **E3-07** Validasi bentrok jadwal pegawai yang sama (status aktif: Draft–Berlangsung), pesan menyebut perjalanan yang bentrok.
-- [ ] **E3-08** Simpan `Draft` dan aksi `Ajukan` (Draft → Diajukan) dengan guard transisi.
-- [ ] **E3-09** Kunci edit setelah `Disetujui` (hanya `catatan`), hapus hanya untuk `Draft`.
-- [ ] **E3-10** Aksi `Batalkan` dengan alasan (Draft/Diajukan/Disetujui/Berlangsung).
-- [ ] **E3-11** Halaman detail perjalanan: data, rincian biaya, riwayat status, aksi sesuai peran.
-- [ ] **E3-12** Test: validasi tanggal, bentrok, izin Admin vs Pegawai, guard transisi, total biaya.
+- [x] **E3-01** Migrasi `trips` (field PRD §7) + index `(user_id, tanggal_mulai)`, `(status)`.
+- [x] **E3-02** Migrasi `trip_costs` + model, relasi, dan perhitungan subtotal/total.
+- [x] **E3-03** Model `Trip` + factory dengan state status (`draft`, `diajukan`, `disetujui`, `berlangsung`, `selesai`, `ditolak`, `dibatalkan`).
+- [x] **E3-04** Halaman daftar perjalanan: filter status/unit/pegawai/rentang tanggal, kolom status berwarna.
+- [x] **E3-05** Form create/edit (React): data perjalanan + editor rincian biaya dinamis (tambah/hapus baris, total live).
+- [x] **E3-06** Validasi server: tanggal selesai ≥ mulai, field wajib, pegawai aktif, pegawai dalam unit yang benar.
+- [x] **E3-07** Validasi bentrok jadwal pegawai yang sama (status aktif: Draft–Berlangsung), pesan menyebut perjalanan yang bentrok.
+- [x] **E3-08** Simpan `Draft` dan aksi `Ajukan` (Draft → Diajukan) dengan guard transisi.
+- [x] **E3-09** Kunci edit setelah `Disetujui` (hanya `catatan`), hapus hanya untuk `Draft`.
+- [x] **E3-10** Aksi `Batalkan` dengan alasan (Draft/Diajukan/Disetujui/Berlangsung).
+- [x] **E3-11** Halaman detail perjalanan: data, rincian biaya, riwayat status, aksi sesuai peran.
+- [x] **E3-12** Test: validasi tanggal, bentrok, izin Admin vs Pegawai, guard transisi, total biaya.
 
 **Gate E3**: Admin membuat perjalanan 3 hari + 2 rincian biaya dan mengajukannya; Pegawai tidak bisa membuka form.
 
@@ -163,3 +163,4 @@ Tracker ini adalah daftar kerja tunggal saat implementasi. Sumber kebenaran kebu
 | 10 Nov 2026 | E0-01..E0-08 | Fondasi Inertia + React + TS, layout, enum, auth dasar, seeder akun. Lulus build, tsc, 9 test. |
 | 10 Nov 2026 | E1-01..E1-08 | Peran via middleware, profil + TTD privat, CRUD akun Super Admin. 19 test hijau. |
 | 10 Nov 2026 | E2-01..E2-08 | CRUD unit + proteksi relasi, CRUD pegawai + impor CSV, pengaturan instansi + logo. 37 test hijau. |
+| 10 Nov 2026 | E3-01..E3-12 | CRUD perjalanan + rincian biaya, validasi bentrok jadwal, guard transisi, pembatalan, detail + riwayat. 52 test hijau. |

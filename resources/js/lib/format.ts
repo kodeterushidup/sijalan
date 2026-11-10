@@ -29,3 +29,17 @@ export function formatRupiah(value: number | string): string {
         maximumFractionDigits: 0,
     }).format(Number(value));
 }
+
+export function formatDateTime(value: string | null | undefined): string {
+    if (!value) {
+        return '-';
+    }
+
+    return new Intl.DateTimeFormat('id-ID', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    }).format(new Date(value));
+}

@@ -1,5 +1,5 @@
 import { Head, Link, router, useForm } from '@inertiajs/react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import AppLayout from '@/components/AppLayout';
 import Flash from '@/components/Flash';
 import PageHeader from '@/components/PageHeader';
@@ -15,6 +15,13 @@ type Cost = {
     jumlah: number;
     tarif: number;
     subtotal: number;
+};
+
+type Photo = {
+    id: number;
+    url: string;
+    is_image: boolean;
+    keterangan: string | null;
 };
 
 type Trip = {
@@ -48,6 +55,8 @@ type Trip = {
     selesai_at: string | null;
     dibatalkan_at: string | null;
     approver: string | null;
+    report: { disusun_at: string | null } | null;
+    photos: Photo[];
 };
 
 type Actions = {
@@ -59,15 +68,36 @@ type Actions = {
     canApprove: boolean;
     canReject: boolean;
     canPrintSppd: boolean;
+    canWriteReport: boolean;
+    canUploadPhotos: boolean;
+    canComplete: boolean;
+    canPrintReport: boolean;
 };
 
-export default function TripsShow({ trip, actions }: { trip: Trip; actions: Actions }) {
+type Completion = {
+    has_report: boolean;
+    photo_count: number;
+    end_passed: boolean;
+};
+
+export default function TripsShow({
+    trip,
+    actions,
+    completion,
+}: {
+    trip: Trip;
+    actions: Actions;
+    completion: Completion;
+}) {
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [showCancel, setShowCancel] = useState(false);
     const [showReject, setShowReject] = useState(false);
     const cancelForm = useForm({ alasan_pembatalan: '' });
     const rejectForm = useForm({ alasan_penolakan: '' });
     const rejectStatusError = (rejectForm.errors as Partial<Record<string, string>>).status;
+    const photoForm = useForm<{ photos: File[]; keterangan: string[] }>({ photos: [], keterangan: [] });
+    const photoErrors = photoForm.errors as Partial<Record<string, string>>;
+    const fileInput = useRef<HTMLInputElement>(null);
 
     function approve() {
         router.post(`/perjalanan/${trip.id}/setujui`, {}, { preserveScroll: true });
@@ -82,6 +112,40 @@ export default function TripsShow({ trip, actions }: { trip: Trip; actions: Acti
                 setShowReject(false);
             },
         });
+    }
+
+    function selectPhotos(files: FileList | null) {
+        const list = files ? Array.from(files) : [];
+        photoForm.setData({ photos: list, keterangan: list.map(() => '') });
+    }
+
+    function setCaption(index: number, value: string) {
+        photoForm.setData(
+            'keterangan',
+            photoForm.data.keterangan.map((caption, position) => (position === index ? value : caption)),
+        );
+    }
+
+    function uploadPhotos(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+        photoForm.post(`/perjalanan/${trip.id}/dokumentasi`, {
+            forceFormData: true,
+            preserveScroll: true,
+            onSuccess: () => {
+                photoForm.reset();
+                if (fileInput.current) {
+                    fileInput.current.value = '';
+                }
+            },
+        });
+    }
+
+    function deletePhoto(photo: Photo) {
+        router.delete(`/perjalanan/${trip.id}/dokumentasi/${photo.id}`, { preserveScroll: true });
+    }
+
+    function completeTrip() {
+        router.post(`/perjalanan/${trip.id}/selesai`, {}, { preserveScroll: true });
     }
 
     function submitTrip() {
@@ -110,6 +174,8 @@ export default function TripsShow({ trip, actions }: { trip: Trip; actions: Acti
         trip.dibatalkan_at ? { label: 'Dibatalkan', at: trip.dibatalkan_at, note: null } : null,
     ].filter((item): item is { label: string; at: string; note: string | null } => item !== null);
 
+    const completionReady = completion.has_report && completion.photo_count > 0 && completion.end_passed;
+
     return (
         <AppLayout>
             <Head title={trip.maksud} />
@@ -123,6 +189,11 @@ export default function TripsShow({ trip, actions }: { trip: Trip; actions: Acti
                         {actions.canPrintSppd ? (
                             <Link href={`/perjalanan/${trip.id}/sppd`} className={btnSecondary}>
                                 Cetak SPPD
+                            </Link>
+                        ) : null}
+                        {actions.canPrintReport ? (
+                            <Link href={`/perjalanan/${trip.id}/laporan`} className={btnSecondary}>
+                                Cetak laporan
                             </Link>
                         ) : null}
                         {actions.canApprove ? (
@@ -338,6 +409,146 @@ export default function TripsShow({ trip, actions }: { trip: Trip; actions: Acti
                             </>
                         )}
                     </section>
+
+                    <section className={`${cardClass} p-5`}>
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                            <h2 className="font-display text-2xl text-ink">Laporan perjalanan</h2>
+                            {actions.canPrintReport ? (
+                                <Link href={`/perjalanan/${trip.id}/laporan`} className={btnSecondary}>
+                                    Cetak laporan
+                                </Link>
+                            ) : null}
+                        </div>
+
+                        {trip.report ? (
+                            <>
+                                <p className="mt-3 text-sm text-muted">
+                                    Disusun {formatDateTime(trip.report.disusun_at)}.
+                                </p>
+                                {actions.canWriteReport ? (
+                                    <Link href={`/perjalanan/${trip.id}/laporan/isi`} className={`${btnSecondary} mt-3`}>
+                                        Ubah laporan
+                                    </Link>
+                                ) : null}
+                            </>
+                        ) : (
+                            <>
+                                <p className="mt-3 text-sm text-muted">
+                                    {actions.canWriteReport
+                                        ? 'Laporan belum diisi. Lengkapi sebelum perjalanan ditandai selesai oleh Admin.'
+                                        : 'Laporan belum diisi oleh pegawai yang melaksanakan perjalanan.'}
+                                </p>
+                                {actions.canWriteReport ? (
+                                    <Link href={`/perjalanan/${trip.id}/laporan/isi`} className={`${btnPrimary} mt-3`}>
+                                        Isi laporan
+                                    </Link>
+                                ) : null}
+                            </>
+                        )}
+                    </section>
+
+                    <section className={`${cardClass} p-5`}>
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                            <h2 className="font-display text-2xl text-ink">Dokumentasi</h2>
+                            <p className="text-sm text-muted">{trip.photos.length} dari 10 berkas</p>
+                        </div>
+
+                        {trip.photos.length === 0 ? (
+                            <p className="mt-3 rounded-sm border border-dashed border-line bg-paper px-4 py-5 text-center text-sm text-muted">
+                                Belum ada foto atau berkas dokumentasi.
+                            </p>
+                        ) : (
+                            <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                                {trip.photos.map((photo) => (
+                                    <li key={photo.id}>
+                                        <a
+                                            href={photo.url}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="block overflow-hidden rounded-sm border border-line"
+                                        >
+                                            {photo.is_image ? (
+                                                <img
+                                                    src={photo.url}
+                                                    alt={photo.keterangan ?? 'Dokumentasi perjalanan'}
+                                                    className="h-24 w-full object-cover"
+                                                    loading="lazy"
+                                                />
+                                            ) : (
+                                                <span className="flex h-24 w-full items-center justify-center bg-paper text-sm font-semibold text-ink">
+                                                    Berkas PDF
+                                                </span>
+                                            )}
+                                        </a>
+                                        <p className="mt-1 text-xs text-muted">
+                                            {photo.keterangan?.trim() ? photo.keterangan : 'Tanpa keterangan'}
+                                        </p>
+                                        {actions.canUploadPhotos ? (
+                                            <button
+                                                type="button"
+                                                onClick={() => deletePhoto(photo)}
+                                                className="mt-1 inline-flex min-h-11 items-center text-xs font-semibold text-danger underline underline-offset-2"
+                                            >
+                                                Hapus berkas
+                                            </button>
+                                        ) : null}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+
+                        {actions.canUploadPhotos && trip.photos.length < 10 ? (
+                            <form onSubmit={uploadPhotos} className="mt-4 border-t border-line pt-4">
+                                <label htmlFor="photos" className={labelClass}>Tambah dokumentasi</label>
+                                <input
+                                    ref={fileInput}
+                                    id="photos"
+                                    type="file"
+                                    multiple
+                                    accept=".jpg,.jpeg,.png,.pdf"
+                                    onChange={(event) => selectPhotos(event.target.files)}
+                                    className={inputClass}
+                                />
+                                <p className="mt-1 text-xs text-muted">
+                                    JPG, PNG, atau PDF. Maksimal 5 MB per berkas dan 10 berkas per perjalanan.
+                                </p>
+
+                                {photoForm.data.photos.length > 0 ? (
+                                    <ul className="mt-3 space-y-3">
+                                        {photoForm.data.photos.map((file, index) => (
+                                            <li key={`${file.name}-${index}`}>
+                                                <p className="truncate text-sm font-medium text-ink">{file.name}</p>
+                                                <label htmlFor={`keterangan-${index}`} className="sr-only">
+                                                    Keterangan untuk {file.name}
+                                                </label>
+                                                <input
+                                                    id={`keterangan-${index}`}
+                                                    type="text"
+                                                    maxLength={150}
+                                                    value={photoForm.data.keterangan[index] ?? ''}
+                                                    onChange={(event) => setCaption(index, event.target.value)}
+                                                    placeholder="Keterangan opsional"
+                                                    className={`${inputClass} mt-1`}
+                                                />
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : null}
+
+                                {Object.keys(photoErrors).length > 0 ? (
+                                    <p className={errorClass} role="alert">{Object.values(photoErrors)[0]}</p>
+                                ) : null}
+
+                                <button
+                                    type="submit"
+                                    disabled={photoForm.processing || photoForm.data.photos.length === 0}
+                                    className={`${btnPrimary} mt-3`}
+                                >
+                                    {photoForm.processing ? 'Mengunggah...' : 'Unggah dokumentasi'}
+                                </button>
+                            </form>
+                        ) : null}
+                    </section>
                 </div>
 
                 <div className="space-y-4">
@@ -379,6 +590,46 @@ export default function TripsShow({ trip, actions }: { trip: Trip; actions: Acti
                             Status saat ini: <span className="font-semibold text-ink">{trip.status_label}</span>
                         </p>
                     </section>
+
+                    {actions.canComplete ? (
+                        <section className={`${cardClass} p-5`}>
+                            <h2 className="font-display text-2xl text-ink">Verifikasi pemberkasan</h2>
+                            <p className="mt-1 text-sm text-muted">
+                                Perjalanan dapat ditandai selesai setelah semua syarat terpenuhi.
+                            </p>
+                            <ul className="mt-3 space-y-2 text-sm">
+                                {[
+                                    { done: completion.has_report, label: 'Laporan perjalanan terisi' },
+                                    {
+                                        done: completion.photo_count > 0,
+                                        label: `Dokumentasi minimal satu berkas (${completion.photo_count} tersedia)`,
+                                    },
+                                    { done: completion.end_passed, label: 'Tanggal selesai sudah lewat' },
+                                ].map((item) => (
+                                    <li key={item.label} className="flex gap-2">
+                                        <span className={item.done ? 'font-semibold text-success' : 'font-semibold text-danger'} aria-hidden="true">
+                                            {item.done ? '✓' : '×'}
+                                        </span>
+                                        <span className={item.done ? 'text-ink' : 'text-muted'}>
+                                            <span className="sr-only">{item.done ? 'Terpenuhi: ' : 'Belum terpenuhi: '}</span>
+                                            {item.label}
+                                        </span>
+                                    </li>
+                                ))}
+                            </ul>
+                            <button
+                                type="button"
+                                onClick={completeTrip}
+                                disabled={!completionReady}
+                                className={`${btnPrimary} mt-4`}
+                            >
+                                Tandai selesai
+                            </button>
+                            {!completionReady ? (
+                                <p className="mt-2 text-xs text-muted">Lengkapi syarat di atas untuk mengaktifkan tombol ini.</p>
+                            ) : null}
+                        </section>
+                    ) : null}
 
                     {actions.canDelete ? (
                         <section className={`${cardClass} p-5`}>

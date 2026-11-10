@@ -10,6 +10,8 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SppdController;
 use App\Http\Controllers\TripApprovalController;
 use App\Http\Controllers\TripController;
+use App\Http\Controllers\TripPhotoController;
+use App\Http\Controllers\TripReportController;
 use App\Http\Controllers\UnitController;
 use Illuminate\Support\Facades\Route;
 
@@ -67,10 +69,18 @@ Route::middleware('auth')->group(function (): void {
         Route::delete('/perjalanan/{trip}', [TripController::class, 'destroy'])->name('trips.destroy');
         Route::post('/perjalanan/{trip}/ajukan', [TripController::class, 'submit'])->name('trips.submit');
         Route::post('/perjalanan/{trip}/batalkan', [TripController::class, 'cancel'])->name('trips.cancel');
+        Route::post('/perjalanan/{trip}/selesai', [TripController::class, 'complete'])->name('trips.complete');
     });
 
     Route::get('/perjalanan/{trip}', [TripController::class, 'show'])->name('trips.show');
     Route::get('/perjalanan/{trip}/sppd', [SppdController::class, 'show'])->name('trips.sppd');
+
+    Route::get('/perjalanan/{trip}/laporan/isi', [TripReportController::class, 'edit'])->name('trips.report.edit');
+    Route::patch('/perjalanan/{trip}/laporan', [TripReportController::class, 'update'])->name('trips.report.update');
+    Route::get('/perjalanan/{trip}/laporan', [TripReportController::class, 'show'])->name('trips.report.show');
+
+    Route::post('/perjalanan/{trip}/dokumentasi', [TripPhotoController::class, 'store'])->name('trips.photos.store');
+    Route::delete('/perjalanan/{trip}/dokumentasi/{photo}', [TripPhotoController::class, 'destroy'])->name('trips.photos.destroy');
 
     Route::middleware('role:super_admin')->group(function (): void {
         Route::get('/akun', [AccountController::class, 'index'])->name('accounts.index');

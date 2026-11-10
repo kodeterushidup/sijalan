@@ -134,6 +134,8 @@ class TripController extends Controller
             'creator:id,name',
             'approver:id,name',
             'costs',
+            'report',
+            'photos',
         ]);
 
         $user = $request->user();
@@ -179,6 +181,20 @@ class TripController extends Controller
                 'selesai_at' => $trip->selesai_at?->toIso8601String(),
                 'dibatalkan_at' => $trip->dibatalkan_at?->toIso8601String(),
                 'approver' => $trip->approver?->name,
+                'report' => $trip->report ? [
+                    'disusun_at' => $trip->report->disusun_at?->toIso8601String(),
+                ] : null,
+                'photos' => $trip->photos->map(fn ($photo): array => [
+                    'id' => $photo->id,
+                    'url' => $photo->url(),
+                    'is_image' => $photo->isImage(),
+                    'keterangan' => $photo->keterangan,
+                ])->values(),
+            ],
+            'completion' => [
+                'has_report' => $trip->report !== null,
+                'photo_count' => $trip->photos->count(),
+                'end_passed' => $trip->tanggal_selesai->lte(now()->startOfDay()),
             ],
             'actions' => [
                 'canEdit' => $canManage && in_array($trip->status, [
@@ -204,6 +220,10 @@ class TripController extends Controller
                     TripStatus::Berlangsung,
                     TripStatus::Selesai,
                 ], true),
+                'canWriteReport' => $trip->user_id === $user->id && $trip->status === TripStatus::Berlangsung,
+                'canUploadPhotos' => $trip->user_id === $user->id && $trip->status === TripStatus::Berlangsung,
+                'canComplete' => $canManage && $trip->status === TripStatus::Berlangsung,
+                'canPrintReport' => $trip->report !== null,
             ],
         ]);
     }
@@ -318,6 +338,32 @@ class TripController extends Controller
         ]);
 
         return back()->with('success', 'Perjalanan dibatalkan.');
+    }
+
+    public function complete(Trip $trip): RedirectResponse
+    {
+        $this->authorize('complete', $trip);
+
+        $trip->loadCount('photos')->load('report');
+
+        if ($trip->report === null) {
+            return back()->with('error', 'Laporan perjalanan belum diisi.');
+        }
+
+        if ($trip->photos_count < 1) {
+            return back()->with('error', 'Minimal satu berkas dokumentasi wajib diunggah.');
+        }
+
+        if ($trip->tanggal_selesai->isAfter(now()->startOfDay())) {
+            return back()->with('error', 'Perjalanan belum melewati tanggal selesai.');
+        }
+
+        $trip->update([
+            'status' => TripStatus::Selesai,
+            'selesai_at' => now(),
+        ]);
+
+        return back()->with('success', 'Perjalanan ditandai selesai.');
     }
 
     public function destroy(Trip $trip): RedirectResponse

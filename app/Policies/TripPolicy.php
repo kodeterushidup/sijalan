@@ -56,4 +56,19 @@ class TripPolicy
     {
         return $user->role->isApprover() && $trip->status === TripStatus::Diajukan;
     }
+
+    public function updateReport(User $user, Trip $trip): bool
+    {
+        return $trip->user_id === $user->id && $trip->status === TripStatus::Berlangsung;
+    }
+
+    public function uploadPhotos(User $user, Trip $trip): bool
+    {
+        return $trip->user_id === $user->id && $trip->status === TripStatus::Berlangsung;
+    }
+
+    public function complete(User $user, Trip $trip): bool
+    {
+        return $user->role->canManageData() && $trip->status === TripStatus::Berlangsung;
+    }
 }

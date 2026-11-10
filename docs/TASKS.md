@@ -110,15 +110,16 @@ Tracker ini adalah daftar kerja tunggal saat implementasi. Sumber kebenaran kebu
 
 ## E6 — Laporan & dokumentasi
 
-- [ ] **E6-01** Migrasi `trip_reports` (unik per trip) + model + relasi.
-- [ ] **E6-02** Halaman isi laporan (Pegawai pemilik, status `Berlangsung`): hasil, kendala, rekomendasi (wajib, maks 5.000).
-- [ ] **E6-03** Simpan/ubah laporan selama belum `Selesai` (isi `disusun_at`).
-- [ ] **E6-04** Migrasi `trip_photos` + unggah multi-file (JPG/PNG/PDF, maks 5 MB, maks 10/trip).
-- [ ] **E6-05** Galeri: thumbnail gambar, ikon PDF, keterangan opsional (maks 150), hapus oleh pemilik sebelum `Selesai`.
-- [ ] **E6-06** Guard unggah/hapus: hanya status `Berlangsung` dan hanya pemilik.
-- [ ] **E6-07** Aksi Admin `Selesai`: tolak jika laporan kosong, foto < 1, atau `tanggal_selesai` belum lewat.
-- [ ] **E6-08** Halaman cetak Laporan Perjalanan (kop, nomor SPPD, data, uraian, kendala, rekomendasi, daftar lampiran, TTD pegawai).
-- [ ] **E6-09** Test: gate `Selesai`, validasi file, hapus setelah selesai ditolak, akses non-pemilik.
+- [x] **E6-01** Migrasi `trip_reports` (unik per trip) + model + relasi.
+- [x] **E6-02** Halaman isi laporan (Pegawai pemilik, status `Berlangsung`): hasil, kendala, rekomendasi (wajib, maks 5.000).
+- [x] **E6-03** Simpan/ubah laporan selama belum `Selesai` (isi `disusun_at`).
+- [x] **E6-04** Migrasi `trip_photos` + unggah multi-file (JPG/PNG/PDF, maks 5 MB, maks 10/trip).
+- [x] **E6-05** Galeri: thumbnail gambar, ikon PDF, keterangan opsional (maks 150), hapus oleh pemilik sebelum `Selesai`.
+- [x] **E6-06** Guard unggah/hapus: hanya status `Berlangsung` dan hanya pemilik.
+- [x] **E6-07** Aksi Admin `Selesai`: tolak jika laporan kosong, foto < 1, atau `tanggal_selesai` belum lewat.
+- [x] **E6-08** Halaman cetak Laporan Perjalanan (kop, nomor SPPD, data, uraian, kendala, rekomendasi, daftar lampiran, TTD pegawai).
+- [x] **E6-09** Test: gate `Selesai`, validasi file, hapus setelah selesai ditolak, akses non-pemilik.
+- [x] **E6-10** Penjadwal harian `trips:advance-status` (00:05 Asia/Jakarta) untuk `Disetujui` → `Berlangsung`.
 
 **Gate E6**: Alur demo §9 langkah 6–7 lulus tanpa error.
 
@@ -166,3 +167,4 @@ Tracker ini adalah daftar kerja tunggal saat implementasi. Sumber kebenaran kebu
 | 10 Nov 2026 | E3-01..E3-12 | CRUD perjalanan + rincian biaya, validasi bentrok jadwal, guard transisi, pembatalan, detail + riwayat. 52 test hijau. |
 | 10 Nov 2026 | E4-01..E4-08 | Antrean persetujuan Pejabat, setujui/tolak, penomoran SPPD per unit/tahun tanpa reuse, halaman cetak SPPD. 60 test hijau. |
 | 10 Nov 2026 | E5-01..E5-07 | Kalender bulanan 7×6, navigasi bulan, filter unit/pegawai, entri multi-hari berwarna, daftar mobile. 67 test hijau. |
+| 10 Nov 2026 | E6-01..E6-10 | Laporan perjalanan + cetak, galeri dokumentasi dengan caption, gate verifikasi `Selesai`, penjadwal harian. 78 test hijau. |

@@ -8,6 +8,7 @@ locality:
 env:
   APP_NAME: SIJALAN
   APP_ENV: production
+  APP_KEY: 'base64:AWn+a9VeD/DBdAFLjWdDoCw/uJL2Cmi+/J4ICQGod6E='
   APP_DEBUG: 'false'
   APP_URL: https://sijalan.wasmer.app
   APP_LOCALE: id

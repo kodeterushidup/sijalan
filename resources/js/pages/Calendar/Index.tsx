@@ -1,0 +1,306 @@
+import { Head, Link, router } from '@inertiajs/react';
+import { useState } from 'react';
+import AppLayout from '@/components/AppLayout';
+import Flash from '@/components/Flash';
+import PageHeader from '@/components/PageHeader';
+import StatusBadge, { statusStyles } from '@/components/StatusBadge';
+import { formatDateShort } from '@/lib/format';
+import { btnPrimary, btnSecondary, cardClass, inputClass, labelClass } from '@/lib/styles';
+import type { TripStatus } from '@/types';
+
+type Day = {
+    date: string;
+    day: number;
+    in_month: boolean;
+    is_today: boolean;
+};
+
+type TripEntry = {
+    id: number;
+    maksud: string;
+    tempat_tujuan: string;
+    pegawai: string;
+    unit: string;
+    tanggal_mulai: string;
+    tanggal_selesai: string;
+    status: TripStatus;
+    status_label: string;
+    nomor_sppd: string | null;
+};
+
+type Option = { value: number; label: string };
+
+const weekdays = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+
+const legend: { status: TripStatus; label: string }[] = [
+    { status: 'draft', label: 'Draft' },
+    { status: 'diajukan', label: 'Menunggu Persetujuan' },
+    { status: 'disetujui', label: 'Disetujui' },
+    { status: 'berlangsung', label: 'Berlangsung' },
+    { status: 'selesai', label: 'Selesai' },
+];
+
+export default function CalendarIndex({
+    bulan,
+    bulanLabel,
+    today,
+    prev,
+    next,
+    days,
+    trips,
+    units,
+    employees,
+    filters,
+    canCreate,
+}: {
+    bulan: string;
+    bulanLabel: string;
+    today: string;
+    prev: string;
+    next: string;
+    days: Day[];
+    trips: TripEntry[];
+    units: Option[];
+    employees: Option[];
+    filters: { unit: number | null; pegawai: number | null };
+    canCreate: boolean;
+}) {
+    const [form, setForm] = useState({
+        unit: filters.unit ? String(filters.unit) : '',
+        pegawai: filters.pegawai ? String(filters.pegawai) : '',
+    });
+
+    function href(targetMonth: string, unit = form.unit, pegawai = form.pegawai): string {
+        const params = new URLSearchParams({ bulan: targetMonth });
+
+        if (unit) {
+            params.set('unit', unit);
+        }
+
+        if (pegawai) {
+            params.set('pegawai', pegawai);
+        }
+
+        return `/kalender?${params.toString()}`;
+    }
+
+    function applyFilters(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+        router.get('/kalender', {
+            bulan,
+            unit: form.unit || undefined,
+            pegawai: form.pegawai || undefined,
+        }, { preserveState: true, replace: true });
+    }
+
+    function resetFilters() {
+        setForm({ unit: '', pegawai: '' });
+        router.get('/kalender', { bulan }, { preserveState: true, replace: true });
+    }
+
+    const monthKey = bulan.slice(0, 7);
+    const [year, month] = monthKey.split('-').map(Number);
+    const monthStart = `${monthKey}-01`;
+    const monthEnd = new Date(Date.UTC(year, month, 0)).toISOString().slice(0, 10);
+    const monthTrips = trips.filter((trip) => trip.tanggal_mulai <= monthEnd && trip.tanggal_selesai >= monthStart);
+
+    return (
+        <AppLayout>
+            <Head title="Kalender perjalanan" />
+            <Flash />
+            <PageHeader
+                title="Kalender perjalanan"
+                description={
+                    canCreate
+                        ? 'Jadwal perjalanan dinas per pegawai dan unit. Klik tanggal untuk mencatat perjalanan baru.'
+                        : 'Jadwal perjalanan dinas Anda. Klik entri untuk melihat detail.'
+                }
+                actions={
+                    canCreate ? (
+                        <Link href="/perjalanan/baru" className={btnPrimary}>
+                            Perjalanan baru
+                        </Link>
+                    ) : undefined
+                }
+            />
+
+            <div className={`${cardClass} mb-4 flex flex-wrap items-center justify-between gap-3 p-4`}>
+                <div className="flex flex-wrap items-center gap-2">
+                    <Link href={href(prev)} className={btnSecondary} aria-label="Bulan sebelumnya">
+                        ← Sebelumnya
+                    </Link>
+                    <p className="min-w-40 text-center font-display text-2xl capitalize text-ink" aria-live="polite">
+                        {bulanLabel}
+                    </p>
+                    <Link href={href(next)} className={btnSecondary} aria-label="Bulan berikutnya">
+                        Berikutnya →
+                    </Link>
+                    <Link href={href(today)} className={btnSecondary}>
+                        Hari ini
+                    </Link>
+                </div>
+
+                {units.length > 0 ? (
+                    <form onSubmit={applyFilters} className="flex flex-wrap items-end gap-2">
+                        <div>
+                            <label htmlFor="unit" className={labelClass}>Unit kerja</label>
+                            <select
+                                id="unit"
+                                value={form.unit}
+                                onChange={(event) => setForm({ ...form, unit: event.target.value })}
+                                className={`${inputClass} min-w-40`}
+                            >
+                                <option value="">Semua unit</option>
+                                {units.map((unit) => (
+                                    <option key={unit.value} value={unit.value}>{unit.label}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label htmlFor="pegawai" className={labelClass}>Pegawai</label>
+                            <select
+                                id="pegawai"
+                                value={form.pegawai}
+                                onChange={(event) => setForm({ ...form, pegawai: event.target.value })}
+                                className={`${inputClass} min-w-48`}
+                            >
+                                <option value="">Semua pegawai</option>
+                                {employees.map((employee) => (
+                                    <option key={employee.value} value={employee.value}>{employee.label}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <button type="submit" className={btnPrimary}>Terapkan</button>
+                        <button type="button" onClick={resetFilters} className={btnSecondary}>Atur ulang</button>
+                    </form>
+                ) : null}
+            </div>
+
+            <div className={`${cardClass} overflow-x-auto`}>
+                <table className="w-full min-w-[760px] border-collapse">
+                    <caption className="sr-only">Kalender perjalanan dinas {bulanLabel}</caption>
+                    <thead>
+                        <tr>
+                            {weekdays.map((weekday) => (
+                                <th
+                                    key={weekday}
+                                    scope="col"
+                                    className="border-b border-line bg-paper px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-muted"
+                                >
+                                    {weekday}
+                                </th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {Array.from({ length: 6 }, (_, row) => (
+                            <tr key={row}>
+                                {days.slice(row * 7, row * 7 + 7).map((day) => {
+                                    const entries = trips.filter(
+                                        (trip) => trip.tanggal_mulai <= day.date && trip.tanggal_selesai >= day.date,
+                                    );
+
+                                    return (
+                                        <td
+                                            key={day.date}
+                                            className={`h-28 border-b border-r border-line align-top p-1.5 ${
+                                                day.in_month ? 'bg-surface' : 'bg-paper/50'
+                                            }`}
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                {canCreate && day.in_month ? (
+                                                    <Link
+                                                        href={`/perjalanan/baru?tanggal=${day.date}`}
+                                                        className={`inline-flex min-h-11 min-w-11 items-center justify-center rounded-sm text-xs font-semibold transition-colors hover:bg-paper ${
+                                                            day.is_today
+                                                                ? 'bg-accent text-white'
+                                                                : day.in_month
+                                                                  ? 'text-ink'
+                                                                  : 'text-muted'
+                                                        }`}
+                                                        aria-label={`Buat perjalanan pada ${formatDateShort(day.date)}`}
+                                                    >
+                                                        {day.day}
+                                                    </Link>
+                                                ) : (
+                                                    <span
+                                                        className={`inline-flex min-h-11 min-w-11 items-center justify-center rounded-sm text-xs font-semibold ${
+                                                            day.is_today
+                                                                ? 'bg-accent text-white'
+                                                                : day.in_month
+                                                                  ? 'text-ink'
+                                                                  : 'text-muted'
+                                                        }`}
+                                                    >
+                                                        {day.day}
+                                                    </span>
+                                                )}
+                                            </div>
+
+                                            <ul className="mt-1 space-y-1">
+                                                {entries.map((trip) => (
+                                                    <li key={trip.id}>
+                                                        <Link
+                                                            href={`/perjalanan/${trip.id}`}
+                                                            title={`${trip.maksud} · ${trip.pegawai}`}
+                                                            className={`block truncate rounded-sm border px-1.5 py-0.5 text-[11px] font-semibold ${statusStyles[trip.status]}`}
+                                                        >
+                                                            {trip.maksud}
+                                                            <span className="sr-only">
+                                                                {' '}oleh {trip.pegawai}, status {trip.status_label}
+                                                            </span>
+                                                        </Link>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </td>
+                                    );
+                                })}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
+            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted">Legenda</p>
+                {legend.map((item) => (
+                    <span key={item.status} className="inline-flex items-center gap-1.5 text-xs text-muted">
+                        <span className={`inline-block size-3 rounded-sm border ${statusStyles[item.status]}`} aria-hidden="true" />
+                        {item.label}
+                    </span>
+                ))}
+            </div>
+
+            <section className="mt-6 lg:hidden">
+                <h2 className="font-display text-2xl text-ink">Perjalanan bulan ini</h2>
+
+                {monthTrips.length === 0 ? (
+                    <p className="mt-2 rounded-sm border border-dashed border-line bg-surface px-4 py-6 text-center text-sm text-muted">
+                        Belum ada perjalanan pada {bulanLabel}.
+                    </p>
+                ) : (
+                    <ul className="mt-3 space-y-2">
+                        {monthTrips.map((trip) => (
+                            <li key={trip.id} className={`${cardClass} p-3`}>
+                                <div className="flex flex-wrap items-center justify-between gap-2">
+                                    <StatusBadge status={trip.status} label={trip.status_label} />
+                                    <p className="text-xs text-muted">
+                                        {formatDateShort(trip.tanggal_mulai)} sampai {formatDateShort(trip.tanggal_selesai)}
+                                    </p>
+                                </div>
+                                <Link
+                                    href={`/perjalanan/${trip.id}`}
+                                    className="mt-1 block font-semibold text-ink underline-offset-2 hover:underline"
+                                >
+                                    {trip.maksud}
+                                </Link>
+                                <p className="text-sm text-muted">{trip.tempat_tujuan} · {trip.pegawai}</p>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </section>
+        </AppLayout>
+    );
+}

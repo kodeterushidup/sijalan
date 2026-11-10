@@ -10,6 +10,8 @@ const styles: Record<TripStatus, string> = {
     dibatalkan: 'border-line bg-paper text-muted',
 };
 
+export const statusStyles = styles;
+
 export default function StatusBadge({ status, label }: { status: TripStatus; label: string }) {
     return (
         <span

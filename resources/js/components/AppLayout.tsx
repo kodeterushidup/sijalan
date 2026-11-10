@@ -10,6 +10,7 @@ type NavItem = {
 const navByRole: Record<Role, NavItem[]> = {
     super_admin: [
         { label: 'Ringkasan', href: '/' },
+        { label: 'Kalender', href: '/kalender' },
         { label: 'Perjalanan', href: '/perjalanan' },
         { label: 'Pegawai', href: '/pegawai' },
         { label: 'Unit kerja', href: '/unit' },
@@ -19,6 +20,7 @@ const navByRole: Record<Role, NavItem[]> = {
     ],
     admin: [
         { label: 'Ringkasan', href: '/' },
+        { label: 'Kalender', href: '/kalender' },
         { label: 'Perjalanan', href: '/perjalanan' },
         { label: 'Pegawai', href: '/pegawai' },
         { label: 'Unit kerja', href: '/unit' },
@@ -26,12 +28,14 @@ const navByRole: Record<Role, NavItem[]> = {
     ],
     pejabat: [
         { label: 'Ringkasan', href: '/' },
+        { label: 'Kalender', href: '/kalender' },
         { label: 'Persetujuan', href: '/persetujuan' },
         { label: 'Perjalanan', href: '/perjalanan' },
         { label: 'Profil', href: '/profil' },
     ],
     pegawai: [
         { label: 'Ringkasan', href: '/' },
+        { label: 'Kalender', href: '/kalender' },
         { label: 'Riwayat perjalanan', href: '/perjalanan' },
         { label: 'Profil', href: '/profil' },
     ],

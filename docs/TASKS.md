@@ -98,13 +98,13 @@ Tracker ini adalah daftar kerja tunggal saat implementasi. Sumber kebenaran kebu
 
 ## E5 — Kalender
 
-- [ ] **E5-01** Props kalender per bulan: perjalanan aktif + status, dikelompokkan per tanggal.
-- [ ] **E5-02** Komponen grid bulanan React: 7×6, nama hari Indonesia, navigasi bulan, tombol hari ini.
-- [ ] **E5-03** Entri multi-hari tampil di setiap tanggal; warna per status + legenda.
-- [ ] **E5-04** Filter unit dan pegawai (Admin/Pejabat); Pegawai hanya melihat miliknya.
-- [ ] **E5-05** Klik tanggal membuka form create dengan tanggal terisi (Admin/Super Admin); klik entri membuka detail.
-- [ ] **E5-06** Daftar perjalanan bulan berjalan di bawah kalender untuk mobile.
-- [ ] **E5-07** Test: cakupan data per peran, filter unit, navigasi bulan, tanggal terisi otomatis.
+- [x] **E5-01** Props kalender per bulan: perjalanan aktif + status, dikelompokkan per tanggal.
+- [x] **E5-02** Komponen grid bulanan React: 7×6, nama hari Indonesia, navigasi bulan, tombol hari ini.
+- [x] **E5-03** Entri multi-hari tampil di setiap tanggal; warna per status + legenda.
+- [x] **E5-04** Filter unit dan pegawai (Admin/Pejabat); Pegawai hanya melihat miliknya.
+- [x] **E5-05** Klik tanggal membuka form create dengan tanggal terisi (Admin/Super Admin); klik entri membuka detail.
+- [x] **E5-06** Daftar perjalanan bulan berjalan di bawah kalender untuk mobile.
+- [x] **E5-07** Test: cakupan data per peran, filter unit, navigasi bulan, tanggal terisi otomatis.
 
 **Gate E5**: Kalender menampilkan perjalanan demo pada tanggal yang benar dan tidak membocorkan data pegawai lain.
 
@@ -165,3 +165,4 @@ Tracker ini adalah daftar kerja tunggal saat implementasi. Sumber kebenaran kebu
 | 10 Nov 2026 | E2-01..E2-08 | CRUD unit + proteksi relasi, CRUD pegawai + impor CSV, pengaturan instansi + logo. 37 test hijau. |
 | 10 Nov 2026 | E3-01..E3-12 | CRUD perjalanan + rincian biaya, validasi bentrok jadwal, guard transisi, pembatalan, detail + riwayat. 52 test hijau. |
 | 10 Nov 2026 | E4-01..E4-08 | Antrean persetujuan Pejabat, setujui/tolak, penomoran SPPD per unit/tahun tanpa reuse, halaman cetak SPPD. 60 test hijau. |
+| 10 Nov 2026 | E5-01..E5-07 | Kalender bulanan 7×6, navigasi bulan, filter unit/pegawai, entri multi-hari berwarna, daftar mobile. 67 test hijau. |

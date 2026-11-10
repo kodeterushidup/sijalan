@@ -1,0 +1,229 @@
+import { Link, router, usePage } from '@inertiajs/react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import type { Role, SharedPageProps } from '@/types';
+
+type NavItem = {
+    label: string;
+    href: string;
+};
+
+const navByRole: Record<Role, NavItem[]> = {
+    super_admin: [{ label: 'Ringkasan', href: '/' }],
+    admin: [{ label: 'Ringkasan', href: '/' }],
+    pejabat: [{ label: 'Ringkasan', href: '/' }],
+    pegawai: [{ label: 'Ringkasan', href: '/' }],
+};
+
+function useActive(href: string): boolean {
+    const { url } = usePage();
+
+    return href === '/' ? url === '/' : url.startsWith(href);
+}
+
+function NavList({ items, onNavigate }: { items: NavItem[]; onNavigate?: () => void }) {
+    return (
+        <ul className="space-y-1">
+            {items.map((item) => (
+                <NavLink key={item.href} item={item} onNavigate={onNavigate} />
+            ))}
+        </ul>
+    );
+}
+
+function NavLink({ item, onNavigate }: { item: NavItem; onNavigate?: () => void }) {
+    const active = useActive(item.href);
+
+    return (
+        <li>
+            <Link
+                href={item.href}
+                onClick={onNavigate}
+                aria-current={active ? 'page' : undefined}
+                className={`flex min-h-11 items-center rounded-sm px-3 text-sm font-medium transition-colors ${
+                    active
+                        ? 'bg-white/10 text-white'
+                        : 'text-white/75 hover:bg-white/10 hover:text-white'
+                }`}
+            >
+                {item.label}
+            </Link>
+        </li>
+    );
+}
+
+function Brand({ compact = false }: { compact?: boolean }) {
+    return (
+        <div>
+            <p
+                className={`font-display leading-none tracking-wide ${
+                    compact ? 'text-xl' : 'text-3xl'
+                }`}
+            >
+                SIJALAN
+            </p>
+            <p className="mt-1 text-xs text-white/70">Sistem Perjalanan Dinas</p>
+        </div>
+    );
+}
+
+function UserPanel({ compact = false }: { compact?: boolean }) {
+    const { auth } = usePage<SharedPageProps>().props;
+    const user = auth.user;
+
+    if (!user) {
+        return null;
+    }
+
+    return (
+        <div className={`flex items-center gap-3 ${compact ? '' : 'border-t border-white/15 pt-4'}`}>
+            <span
+                className="flex size-10 shrink-0 items-center justify-center rounded-full bg-accent-soft text-sm font-semibold text-accent-deep"
+                aria-hidden="true"
+            >
+                {user.initials}
+            </span>
+            <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-white">{user.name}</p>
+                <p className="truncate text-xs text-white/70">
+                    {user.role_label}
+                    {user.unit ? ` · ${user.unit}` : ''}
+                </p>
+            </div>
+        </div>
+    );
+}
+
+export default function AppLayout({ children }: { children: ReactNode }) {
+    const { auth } = usePage<SharedPageProps>().props;
+    const { url } = usePage();
+    const [menuOpen, setMenuOpen] = useState(false);
+    const closeButtonRef = useRef<HTMLButtonElement>(null);
+    const lastFocused = useRef<HTMLElement | null>(null);
+
+    const items = auth.user ? navByRole[auth.user.role] : [];
+
+    useEffect(() => {
+        setMenuOpen(false);
+    }, [url]);
+
+    useEffect(() => {
+        if (!menuOpen) {
+            document.body.style.overflow = '';
+            lastFocused.current?.focus();
+            return;
+        }
+
+        lastFocused.current = document.activeElement as HTMLElement | null;
+        document.body.style.overflow = 'hidden';
+        closeButtonRef.current?.focus();
+
+        function onKeyDown(event: KeyboardEvent) {
+            if (event.key === 'Escape') {
+                setMenuOpen(false);
+            }
+        }
+
+        window.addEventListener('keydown', onKeyDown);
+
+        return () => {
+            window.removeEventListener('keydown', onKeyDown);
+            document.body.style.overflow = '';
+        };
+    }, [menuOpen]);
+
+    return (
+        <div className="min-h-dvh bg-paper">
+            <a
+                href="#konten"
+                className="sr-only z-50 rounded-sm bg-surface px-4 py-3 text-sm font-semibold text-ink focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+            >
+                Lewati ke konten
+            </a>
+
+            <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col bg-ink px-4 py-6 lg:flex">
+                <div className="px-2">
+                    <Brand />
+                </div>
+
+                <nav aria-label="Navigasi utama" className="mt-10 flex-1">
+                    <NavList items={items} />
+                </nav>
+
+                <div className="space-y-4">
+                    <UserPanel />
+                    <button
+                        type="button"
+                        onClick={() => router.post('/logout')}
+                        className="flex min-h-11 w-full items-center rounded-sm px-3 text-sm font-medium text-white/75 transition-colors hover:bg-white/10 hover:text-white"
+                    >
+                        Keluar
+                    </button>
+                </div>
+            </aside>
+
+            <header className="sticky top-0 z-20 flex items-center justify-between border-b border-line bg-surface px-4 py-3 lg:hidden">
+                <p className="font-display text-xl leading-none tracking-wide text-ink">SIJALAN</p>
+                <button
+                    type="button"
+                    onClick={() => setMenuOpen(true)}
+                    aria-expanded={menuOpen}
+                    aria-controls="menu-mobile"
+                    className="inline-flex min-h-11 items-center rounded-sm border border-line px-3 text-sm font-semibold text-ink"
+                >
+                    Menu
+                </button>
+            </header>
+
+            {menuOpen ? (
+                <div className="fixed inset-0 z-40 lg:hidden">
+                    <button
+                        type="button"
+                        aria-label="Tutup menu"
+                        onClick={() => setMenuOpen(false)}
+                        className="absolute inset-0 bg-ink/50"
+                    />
+                    <div
+                        id="menu-mobile"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label="Menu navigasi"
+                        className="relative flex h-full w-72 max-w-[85vw] flex-col bg-ink px-4 py-5"
+                    >
+                        <div className="flex items-start justify-between gap-3">
+                            <Brand compact />
+                            <button
+                                ref={closeButtonRef}
+                                type="button"
+                                onClick={() => setMenuOpen(false)}
+                                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-sm border border-white/25 px-3 text-sm font-semibold text-white"
+                            >
+                                Tutup
+                            </button>
+                        </div>
+
+                        <nav aria-label="Navigasi utama" className="mt-8 flex-1">
+                            <NavList items={items} onNavigate={() => setMenuOpen(false)} />
+                        </nav>
+
+                        <div className="space-y-4">
+                            <UserPanel />
+                            <button
+                                type="button"
+                                onClick={() => router.post('/logout')}
+                                className="flex min-h-11 w-full items-center rounded-sm px-3 text-sm font-medium text-white/75 transition-colors hover:bg-white/10 hover:text-white"
+                            >
+                                Keluar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            ) : null}
+
+            <main id="konten" className="lg:pl-64">
+                <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-10 lg:py-10">
+                    {children}
+                </div>
+            </main>
+        </div>
+    );
+}

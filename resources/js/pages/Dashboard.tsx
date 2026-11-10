@@ -1,0 +1,122 @@
+import { Head, usePage } from '@inertiajs/react';
+import AppLayout from '@/components/AppLayout';
+import EmptyState from '@/components/EmptyState';
+import Flash from '@/components/Flash';
+import PageHeader from '@/components/PageHeader';
+import StatusBadge from '@/components/StatusBadge';
+import { formatDateShort } from '@/lib/format';
+import { cardClass } from '@/lib/styles';
+import type { SharedPageProps, TripStatus } from '@/types';
+
+type Stats = {
+    bulan_ini: number;
+    menunggu: number;
+    berlangsung: number;
+    belum_lengkap: number;
+};
+
+type UpcomingTrip = {
+    id: number;
+    pegawai: string;
+    unit: string;
+    tujuan: string;
+    maksud: string;
+    mulai: string;
+    selesai: string;
+    status: TripStatus;
+    status_label: string;
+};
+
+export default function Dashboard({
+    stats,
+    upcoming,
+}: {
+    stats: Stats;
+    upcoming: UpcomingTrip[];
+}) {
+    const { auth } = usePage<SharedPageProps>().props;
+    const user = auth.user;
+    const isPegawai = user?.role === 'pegawai';
+
+    const focal = isPegawai
+        ? {
+              label: 'Perjalanan sedang berlangsung',
+              value: stats.berlangsung,
+              note: 'Perjalanan yang sudah dimulai dan belum ditutup.',
+          }
+        : {
+              label: 'Menunggu persetujuan',
+              value: stats.menunggu,
+              note: 'Perjalanan yang menunggu keputusan Pejabat Penyetuju.',
+          };
+
+    const secondary = [
+        { label: 'Perjalanan bulan ini', value: stats.bulan_ini },
+        { label: 'Sedang berlangsung', value: stats.berlangsung },
+        { label: 'Berkas belum lengkap', value: stats.belum_lengkap },
+    ];
+
+    const today = new Intl.DateTimeFormat('id-ID', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+    }).format(new Date());
+
+    return (
+        <AppLayout>
+            <Head title="Ringkasan" />
+            <Flash />
+            <PageHeader title="Ringkasan" description={today} />
+
+            <div className="grid gap-4 md:grid-cols-[1.1fr_1fr]">
+                <section className="flex flex-col justify-between rounded-md bg-ink p-6 text-white">
+                    <p className="text-sm font-medium text-accent-soft">{focal.label}</p>
+                    <p className="font-display text-7xl leading-none">{focal.value}</p>
+                    <p className="max-w-sm text-sm text-white/70">{focal.note}</p>
+                </section>
+
+                <dl className={`${cardClass} divide-y divide-line`}>
+                    {secondary.map((item) => (
+                        <div key={item.label} className="flex items-baseline justify-between gap-4 px-5 py-4">
+                            <dt className="text-sm text-muted">{item.label}</dt>
+                            <dd className="font-display text-3xl text-ink">{item.value}</dd>
+                        </div>
+                    ))}
+                </dl>
+            </div>
+
+            <section className="mt-8">
+                <h2 className="mb-3 font-display text-2xl text-ink">Perjalanan terdekat</h2>
+
+                {upcoming.length === 0 ? (
+                    <EmptyState
+                        title="Belum ada perjalanan terdekat"
+                        description={
+                            isPegawai
+                                ? 'Perjalanan yang sudah disetujui dan belum selesai akan muncul di sini.'
+                                : 'Perjalanan yang sudah disetujui akan muncul di sini setelah tanggalnya mendekat.'
+                        }
+                    />
+                ) : (
+                    <ul className={`${cardClass} divide-y divide-line`}>
+                        {upcoming.map((trip) => (
+                            <li key={trip.id} className="flex flex-wrap items-start justify-between gap-3 px-5 py-4">
+                                <div className="min-w-0">
+                                    <p className="text-sm font-semibold text-ink">{trip.maksud}</p>
+                                    <p className="mt-0.5 text-sm text-muted">
+                                        {trip.tujuan} · {trip.pegawai} · {trip.unit}
+                                    </p>
+                                    <p className="mt-1 text-xs text-muted">
+                                        {formatDateShort(trip.mulai)} sampai {formatDateShort(trip.selesai)}
+                                    </p>
+                                </div>
+                                <StatusBadge status={trip.status} label={trip.status_label} />
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </section>
+        </AppLayout>
+    );
+}

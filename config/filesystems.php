@@ -41,8 +41,11 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
+            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/uploads',
             'visibility' => 'public',
+            // Served by Laravel instead of public/storage, so uploads keep
+            // working on hosts where the storage:link symlink cannot ship.
+            'serve' => true,
             'throw' => false,
             'report' => false,
         ],

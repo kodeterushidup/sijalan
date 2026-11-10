@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -21,6 +22,23 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->ensureStorageDirectoriesExist();
         $this->ensureSqliteDatabaseExists();
+        $this->migrateOnBoot();
+    }
+
+    /**
+     * Apply migrations when a production instance starts.
+     *
+     * A pre-deployment job runs in a throwaway container without the storage
+     * volume, so it cannot reach this app's SQLite database. The volume is only
+     * attached once the app itself boots, so migrations run here instead.
+     */
+    protected function migrateOnBoot(): void
+    {
+        if (! $this->app->environment('production') || $this->app->runningInConsole()) {
+            return;
+        }
+
+        Artisan::call('migrate', ['--force' => true]);
     }
 
     /**

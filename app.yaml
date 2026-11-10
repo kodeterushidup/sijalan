@@ -50,15 +50,5 @@ health_checks:
 debug: true
 scaling:
   mode: single_concurrency
-jobs:
-- name: migrate
-  trigger: pre-deployment
-  timeout: 10m
-  action:
-    execute:
-      command: artisan
-      cli_args:
-      - migrate
-      - --force
 description: SIJALAN - Sistem Informasi Perjalanan Dinas
 app_id: da_2J7IAtxUdEXa

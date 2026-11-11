@@ -104,7 +104,7 @@ export default function ReportsShow({
                 </h1>
                 <p className="mt-1 text-center text-sm">Nomor SPPD: {trip.nomor_sppd ?? '-'}</p>
 
-                <dl className="mt-6 grid grid-cols-[10rem_1fr] gap-x-3 gap-y-1 text-sm">
+                <dl className="mt-6 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
                     {[...identity, ...detail].map(([label, value]) => (
                         <div key={label} className="contents">
                             <dt className="font-semibold">{label}</dt>
@@ -115,17 +115,17 @@ export default function ReportsShow({
 
                 <section className="mt-6">
                     <h2 className="font-semibold uppercase">A. Uraian hasil</h2>
-                    <p className="mt-1 whitespace-pre-line text-sm leading-relaxed">{report.hasil}</p>
+                    <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-pretty">{report.hasil}</p>
                 </section>
 
                 <section className="mt-5">
                     <h2 className="font-semibold uppercase">B. Kendala</h2>
-                    <p className="mt-1 whitespace-pre-line text-sm leading-relaxed">{report.kendala}</p>
+                    <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-pretty">{report.kendala}</p>
                 </section>
 
                 <section className="mt-5">
                     <h2 className="font-semibold uppercase">C. Rekomendasi dan tindak lanjut</h2>
-                    <p className="mt-1 whitespace-pre-line text-sm leading-relaxed">{report.rekomendasi}</p>
+                    <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-pretty">{report.rekomendasi}</p>
                 </section>
 
                 <section className="mt-5">
@@ -145,8 +145,9 @@ export default function ReportsShow({
                 </section>
 
                 <div className="mt-10 ml-auto w-72 text-center text-sm">
-                    <p>
-                        Dicetak di {instansi.nama} pada {dicetak}
+                    <p className="text-pretty">
+                        Dicetak di {instansi.nama} pada{' '}
+                        <span className="whitespace-nowrap">{dicetak}</span>
                     </p>
                     <p className="mt-3 font-semibold">Pegawai yang melaksanakan</p>
                     <div className="flex h-24 items-center justify-center">

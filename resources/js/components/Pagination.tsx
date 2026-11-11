@@ -9,6 +9,18 @@ export default function Pagination<T>({
     page: Paginated<T>;
     label: string;
 }) {
+    if (page.total === 0) {
+        return null;
+    }
+
+    if (page.last_page <= 1) {
+        return (
+            <p className="mt-4 text-sm text-muted">
+                Menampilkan {page.data.length} dari {page.total} data.
+            </p>
+        );
+    }
+
     return (
         <nav aria-label={label} className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm">
             <p className="text-muted">

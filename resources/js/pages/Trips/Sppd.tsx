@@ -108,7 +108,7 @@ export default function SppdPrint({
                     Yang bertanda tangan di bawah ini memberi perintah perjalanan dinas kepada:
                 </p>
 
-                <dl className="mt-2 grid grid-cols-[9rem_1fr] gap-x-3 gap-y-1 text-sm">
+                <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
                     {rows.map(([label, value]) => (
                         <div key={label} className="contents">
                             <dt className="font-semibold">{label}</dt>
@@ -119,7 +119,7 @@ export default function SppdPrint({
 
                 <p className="mt-5 text-sm leading-relaxed">Untuk melaksanakan perjalanan dinas dengan rincian:</p>
 
-                <dl className="mt-2 grid grid-cols-[9rem_1fr] gap-x-3 gap-y-1 text-sm">
+                <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
                     {detail.map(([label, value]) => (
                         <div key={label} className="contents">
                             <dt className="font-semibold">{label}</dt>
@@ -151,9 +151,9 @@ export default function SppdPrint({
                                 <tr key={cost.id}>
                                     <td className="border border-black px-2 py-1.5">{cost.jenis_biaya}</td>
                                     <td className="border border-black px-2 py-1.5">{cost.keterangan ?? '-'}</td>
-                                    <td className="border border-black px-2 py-1.5 text-right">{cost.jumlah}</td>
-                                    <td className="border border-black px-2 py-1.5 text-right">{formatRupiah(cost.tarif)}</td>
-                                    <td className="border border-black px-2 py-1.5 text-right">{formatRupiah(cost.subtotal)}</td>
+                                    <td className="border border-black px-2 py-1.5 text-right tabular-nums">{cost.jumlah}</td>
+                                    <td className="border border-black px-2 py-1.5 text-right tabular-nums">{formatRupiah(cost.tarif)}</td>
+                                    <td className="border border-black px-2 py-1.5 text-right tabular-nums">{formatRupiah(cost.subtotal)}</td>
                                 </tr>
                             ))
                         )}
@@ -163,7 +163,7 @@ export default function SppdPrint({
                             <th scope="row" colSpan={4} className="border border-black px-2 py-1.5 text-right font-semibold">
                                 Total biaya
                             </th>
-                            <td className="border border-black px-2 py-1.5 text-right font-semibold">
+                            <td className="border border-black px-2 py-1.5 text-right font-semibold tabular-nums">
                                 {formatRupiah(trip.total_biaya)}
                             </td>
                         </tr>
@@ -171,8 +171,9 @@ export default function SppdPrint({
                 </table>
 
                 <div className="mt-10 ml-auto w-72 text-center text-sm">
-                    <p>
-                        Dicetak di {instansi.nama} pada {dicetak}
+                    <p className="text-pretty">
+                        Dicetak di {instansi.nama} pada{' '}
+                        <span className="whitespace-nowrap">{dicetak}</span>
                     </p>
                     <p className="mt-3 font-semibold">Pejabat Penyetuju</p>
                     <div className="flex h-24 items-center justify-center">

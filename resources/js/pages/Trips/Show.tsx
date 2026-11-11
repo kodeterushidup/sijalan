@@ -363,20 +363,27 @@ export default function TripsShow({
                                     {trip.costs.map((cost) => (
                                         <div key={cost.id} className="rounded-sm border border-line p-3">
                                             <p className="font-semibold text-ink">{cost.jenis_biaya}</p>
-                                            <p className="mt-0.5 text-xs text-muted">
+                                            <p className="mt-0.5 text-xs text-muted tabular-nums">
                                                 {cost.jumlah} x {formatRupiah(cost.tarif)}
                                             </p>
                                             {cost.keterangan ? (
                                                 <p className="mt-1 text-sm text-muted">{cost.keterangan}</p>
                                             ) : null}
-                                            <p className="mt-2 text-sm font-semibold text-ink">{formatRupiah(cost.subtotal)}</p>
+                                            <p className="mt-2 text-sm font-semibold text-ink tabular-nums">{formatRupiah(cost.subtotal)}</p>
                                         </div>
                                     ))}
                                 </div>
 
-                                <div className="mt-4 hidden overflow-x-auto sm:block">
+                                <div
+                                    tabIndex={0}
+                                    role="region"
+                                    aria-labelledby="rincian-biaya-caption"
+                                    className="relative mt-4 hidden overflow-x-auto sm:block"
+                                >
                                     <table className="w-full border-collapse text-left text-sm">
-                                        <caption className="sr-only">Rincian biaya perjalanan</caption>
+                                        <caption id="rincian-biaya-caption" className="sr-only">
+                                            Rincian biaya perjalanan
+                                        </caption>
                                         <thead>
                                             <tr className="border-b border-line text-xs uppercase tracking-wide text-muted">
                                                 <th scope="col" className="py-2 pr-3 font-semibold">Jenis</th>
@@ -391,9 +398,9 @@ export default function TripsShow({
                                                 <tr key={cost.id}>
                                                     <td className="py-2 pr-3 text-ink">{cost.jenis_biaya}</td>
                                                     <td className="px-3 py-2 text-muted">{cost.keterangan ?? '-'}</td>
-                                                    <td className="px-3 py-2 text-right text-ink">{cost.jumlah}</td>
-                                                    <td className="px-3 py-2 text-right text-ink">{formatRupiah(cost.tarif)}</td>
-                                                    <td className="py-2 pl-3 text-right font-semibold text-ink">
+                                                    <td className="px-3 py-2 text-right text-ink tabular-nums">{cost.jumlah}</td>
+                                                    <td className="px-3 py-2 text-right text-ink tabular-nums">{formatRupiah(cost.tarif)}</td>
+                                                    <td className="py-2 pl-3 text-right font-semibold text-ink tabular-nums">
                                                         {formatRupiah(cost.subtotal)}
                                                     </td>
                                                 </tr>
@@ -404,7 +411,7 @@ export default function TripsShow({
 
                                 <p className="mt-4 flex flex-wrap items-baseline justify-between gap-2 border-t border-line pt-3">
                                     <span className="text-sm font-medium text-muted">Total biaya</span>
-                                    <span className="font-display text-2xl text-ink">{formatRupiah(trip.total_biaya)}</span>
+                                    <span className="font-display text-2xl text-ink tabular-nums">{formatRupiah(trip.total_biaya)}</span>
                                 </p>
                             </>
                         )}

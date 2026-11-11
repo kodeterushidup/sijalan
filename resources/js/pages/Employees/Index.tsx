@@ -64,8 +64,8 @@ export default function EmployeesIndex({
                 }
             />
 
-            <form onSubmit={search} className="mb-4 flex flex-wrap items-end gap-3">
-                <div className="min-w-0 flex-1">
+            <form onSubmit={search} className="mb-4 grid gap-3 sm:grid-cols-[minmax(0,1fr)_14rem_auto] sm:items-end">
+                <div className="min-w-0">
                     <label htmlFor="q" className={labelClass}>Cari pegawai</label>
                     <input
                         id="q"
@@ -76,7 +76,7 @@ export default function EmployeesIndex({
                         className={inputClass}
                     />
                 </div>
-                <div>
+                <div className="min-w-0">
                     <label htmlFor="unit" className={labelClass}>Unit kerja</label>
                     <select
                         id="unit"
@@ -93,9 +93,16 @@ export default function EmployeesIndex({
                 <button type="submit" className={btnSecondary}>Terapkan</button>
             </form>
 
-            <div className={`${cardClass} overflow-x-auto`}>
+            <div
+                tabIndex={0}
+                role="region"
+                aria-labelledby="pegawai-caption"
+                className={`${cardClass} relative overflow-x-auto`}
+            >
                 <table className="w-full min-w-[48rem] border-collapse text-left text-sm">
-                    <caption className="sr-only">Daftar pegawai</caption>
+                    <caption id="pegawai-caption" className="sr-only">
+                        Daftar pegawai
+                    </caption>
                     <thead>
                         <tr className="border-b border-line text-xs uppercase tracking-wide text-muted">
                             <th scope="col" className="px-4 py-3 font-semibold">Nama dan NIP</th>
@@ -108,7 +115,7 @@ export default function EmployeesIndex({
                     </thead>
                     <tbody className="divide-y divide-line">
                         {employees.data.map((employee) => (
-                            <tr key={employee.id}>
+                            <tr key={employee.id} className="transition-colors hover:bg-paper/60">
                                 <td className="px-4 py-3">
                                     <p className="font-semibold text-ink">{employee.name}</p>
                                     <p className="text-xs text-muted">NIP {employee.nip ?? '-'}</p>

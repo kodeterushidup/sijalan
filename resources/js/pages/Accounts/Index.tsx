@@ -63,9 +63,16 @@ export default function AccountsIndex({
                 </button>
             </form>
 
-            <div className={`${cardClass} overflow-x-auto`}>
+            <div
+                tabIndex={0}
+                role="region"
+                aria-labelledby="akun-caption"
+                className={`${cardClass} relative overflow-x-auto`}
+            >
                 <table className="w-full min-w-[44rem] border-collapse text-left text-sm">
-                    <caption className="sr-only">Daftar akun pengguna</caption>
+                    <caption id="akun-caption" className="sr-only">
+                        Daftar akun pengguna
+                    </caption>
                     <thead>
                         <tr className="border-b border-line text-xs uppercase tracking-wide text-muted">
                             <th scope="col" className="px-4 py-3 font-semibold">Nama</th>
@@ -79,7 +86,7 @@ export default function AccountsIndex({
                     </thead>
                     <tbody className="divide-y divide-line">
                         {accounts.data.map((account) => (
-                            <tr key={account.id}>
+                            <tr key={account.id} className="transition-colors hover:bg-paper/60">
                                 <td className="px-4 py-3">
                                     <p className="font-semibold text-ink">{account.name}</p>
                                     <p className="text-xs text-muted">{account.email}</p>

@@ -82,7 +82,7 @@ function Brand({ compact = false }: { compact?: boolean }) {
     return (
         <div>
             <p
-                className={`font-display leading-none tracking-wide ${
+                className={`font-display leading-none tracking-wide text-white ${
                     compact ? 'text-xl' : 'text-3xl'
                 }`}
             >
@@ -124,8 +124,8 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     const { auth } = usePage<SharedPageProps>().props;
     const { url } = usePage();
     const [menuOpen, setMenuOpen] = useState(false);
+    const menuRef = useRef<HTMLDialogElement>(null);
     const closeButtonRef = useRef<HTMLButtonElement>(null);
-    const lastFocused = useRef<HTMLElement | null>(null);
 
     const items = auth.user ? navByRole[auth.user.role] : [];
 
@@ -134,29 +134,35 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     }, [url]);
 
     useEffect(() => {
-        if (!menuOpen) {
-            document.body.style.overflow = '';
-            lastFocused.current?.focus();
+        const dialog = menuRef.current;
+
+        if (!dialog) {
             return;
         }
 
-        lastFocused.current = document.activeElement as HTMLElement | null;
-        document.body.style.overflow = 'hidden';
-        closeButtonRef.current?.focus();
+        if (menuOpen && !dialog.open) {
+            dialog.showModal();
+            closeButtonRef.current?.focus();
+        }
 
-        function onKeyDown(event: KeyboardEvent) {
-            if (event.key === 'Escape') {
+        if (!menuOpen && dialog.open) {
+            dialog.close();
+        }
+    }, [menuOpen]);
+
+    useEffect(() => {
+        const wide = window.matchMedia('(min-width: 64rem)');
+
+        function closeOnWide(event: MediaQueryListEvent) {
+            if (event.matches) {
                 setMenuOpen(false);
             }
         }
 
-        window.addEventListener('keydown', onKeyDown);
+        wide.addEventListener('change', closeOnWide);
 
-        return () => {
-            window.removeEventListener('keydown', onKeyDown);
-            document.body.style.overflow = '';
-        };
-    }, [menuOpen]);
+        return () => wide.removeEventListener('change', closeOnWide);
+    }, []);
 
     return (
         <div className="min-h-dvh bg-paper">
@@ -167,7 +173,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                 Lewati ke konten
             </a>
 
-            <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col bg-ink px-4 py-6 lg:flex">
+            <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-white/10 bg-ink px-4 py-6 lg:flex">
                 <div className="px-2">
                     <Brand />
                 </div>
@@ -201,52 +207,53 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                 </button>
             </header>
 
-            {menuOpen ? (
-                <div className="fixed inset-0 z-40 lg:hidden">
-                    <button
-                        type="button"
-                        aria-label="Tutup menu"
-                        onClick={() => setMenuOpen(false)}
-                        className="absolute inset-0 bg-ink/50"
-                    />
-                    <div
-                        id="menu-mobile"
-                        role="dialog"
-                        aria-modal="true"
-                        aria-label="Menu navigasi"
-                        className="relative flex h-full w-72 max-w-[85vw] flex-col bg-ink px-4 py-5"
-                    >
-                        <div className="flex items-start justify-between gap-3">
-                            <Brand compact />
-                            <button
-                                ref={closeButtonRef}
-                                type="button"
-                                onClick={() => setMenuOpen(false)}
-                                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-sm border border-white/25 px-3 text-sm font-semibold text-white"
-                            >
-                                Tutup
-                            </button>
-                        </div>
+            <dialog
+                ref={menuRef}
+                id="menu-mobile"
+                aria-labelledby="menu-mobile-title"
+                onClose={() => setMenuOpen(false)}
+                onClick={(event) => {
+                    if (event.target === menuRef.current) {
+                        setMenuOpen(false);
+                    }
+                }}
+                className="m-0 h-dvh max-h-dvh w-72 max-w-[85vw] bg-ink text-white backdrop:bg-ink/50"
+            >
+                <div className="flex h-full flex-col overflow-y-auto px-4 py-5">
+                    <h2 id="menu-mobile-title" className="sr-only">
+                        Menu navigasi
+                    </h2>
 
-                        <nav aria-label="Navigasi utama" className="mt-8 flex-1">
-                            <NavList items={items} onNavigate={() => setMenuOpen(false)} />
-                        </nav>
+                    <div className="flex items-start justify-between gap-3">
+                        <Brand compact />
+                        <button
+                            ref={closeButtonRef}
+                            type="button"
+                            onClick={() => setMenuOpen(false)}
+                            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-sm border border-white/25 px-3 text-sm font-semibold text-white"
+                        >
+                            Tutup
+                        </button>
+                    </div>
 
-                        <div className="space-y-4">
-                            <UserPanel />
-                            <button
-                                type="button"
-                                onClick={() => router.post('/logout')}
-                                className="flex min-h-11 w-full items-center rounded-sm px-3 text-sm font-medium text-white/75 transition-colors hover:bg-white/10 hover:text-white"
-                            >
-                                Keluar
-                            </button>
-                        </div>
+                    <nav aria-label="Navigasi utama (menu seluler)" className="mt-8 flex-1">
+                        <NavList items={items} onNavigate={() => setMenuOpen(false)} />
+                    </nav>
+
+                    <div className="space-y-4">
+                        <UserPanel />
+                        <button
+                            type="button"
+                            onClick={() => router.post('/logout')}
+                            className="flex min-h-11 w-full items-center rounded-sm px-3 text-sm font-medium text-white/75 transition-colors hover:bg-white/10 hover:text-white"
+                        >
+                            Keluar
+                        </button>
                     </div>
                 </div>
-            ) : null}
+            </dialog>
 
-            <main id="konten" className="lg:pl-64">
+            <main id="konten" tabIndex={-1} className="lg:pl-64">
                 <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-10 lg:py-10">
                     {children}
                 </div>

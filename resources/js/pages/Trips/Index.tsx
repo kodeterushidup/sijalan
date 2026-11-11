@@ -60,6 +60,11 @@ export default function TripsIndex({
         sampai: filters.sampai,
     });
 
+    const activeFilterCount = [form.q, form.status, form.unit, form.pegawai, form.dari, form.sampai].filter(
+        Boolean,
+    ).length;
+    const [filtersOpen, setFiltersOpen] = useState(activeFilterCount > 0);
+
     function apply(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
         router.get('/perjalanan', {
@@ -97,93 +102,124 @@ export default function TripsIndex({
                 }
             />
 
-            <form onSubmit={apply} className={`${cardClass} mb-4 p-4`}>
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                    <div>
-                        <label htmlFor="q" className={labelClass}>Cari</label>
-                        <input
-                            id="q"
-                            type="search"
-                            value={form.q}
-                            onChange={(event) => setForm({ ...form, q: event.target.value })}
-                            placeholder="Maksud, tujuan, atau nomor SPPD"
-                            className={inputClass}
-                        />
+            <div className="mb-4">
+                <button
+                    type="button"
+                    onClick={() => setFiltersOpen((open) => !open)}
+                    aria-expanded={filtersOpen}
+                    aria-controls="filter-perjalanan"
+                    className={`${btnSecondary} w-full justify-between lg:hidden`}
+                >
+                    <span>
+                        Filter
+                        {activeFilterCount > 0 ? ` (${activeFilterCount} aktif)` : ''}
+                    </span>
+                    <svg
+                        viewBox="0 0 20 20"
+                        aria-hidden="true"
+                        className={`size-4 transition-transform ${filtersOpen ? 'rotate-180' : ''}`}
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    >
+                        <path d="M5 8l5 5 5-5" />
+                    </svg>
+                </button>
+
+                <form
+                    id="filter-perjalanan"
+                    onSubmit={apply}
+                    className={`${cardClass} p-4 ${filtersOpen ? 'mt-3' : 'hidden'} lg:mt-0 lg:block`}
+                >
+                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                        <div>
+                            <label htmlFor="q" className={labelClass}>Cari</label>
+                            <input
+                                id="q"
+                                type="search"
+                                value={form.q}
+                                onChange={(event) => setForm({ ...form, q: event.target.value })}
+                                placeholder="Maksud, tujuan, atau nomor SPPD"
+                                className={inputClass}
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="status" className={labelClass}>Status</label>
+                            <select
+                                id="status"
+                                value={form.status}
+                                onChange={(event) => setForm({ ...form, status: event.target.value })}
+                                className={inputClass}
+                            >
+                                <option value="">Semua status</option>
+                                {statuses.map((status) => (
+                                    <option key={status.value} value={status.value}>{status.label}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label htmlFor="unit" className={labelClass}>Unit kerja</label>
+                            <select
+                                id="unit"
+                                value={form.unit}
+                                onChange={(event) => setForm({ ...form, unit: event.target.value })}
+                                className={inputClass}
+                            >
+                                <option value="">Semua unit</option>
+                                {units.map((unit) => (
+                                    <option key={unit.value} value={unit.value}>{unit.label}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label htmlFor="pegawai" className={labelClass}>Pegawai</label>
+                            <select
+                                id="pegawai"
+                                value={form.pegawai}
+                                onChange={(event) => setForm({ ...form, pegawai: event.target.value })}
+                                className={inputClass}
+                            >
+                                <option value="">Semua pegawai</option>
+                                {employees.map((employee) => (
+                                    <option key={employee.value} value={employee.value}>{employee.label}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label htmlFor="dari" className={labelClass}>Mulai dari</label>
+                            <input
+                                id="dari"
+                                type="date"
+                                value={form.dari}
+                                onChange={(event) => setForm({ ...form, dari: event.target.value })}
+                                className={inputClass}
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="sampai" className={labelClass}>Sampai dengan</label>
+                            <input
+                                id="sampai"
+                                type="date"
+                                value={form.sampai}
+                                onChange={(event) => setForm({ ...form, sampai: event.target.value })}
+                                className={inputClass}
+                            />
+                        </div>
                     </div>
 
-                    <div>
-                        <label htmlFor="status" className={labelClass}>Status</label>
-                        <select
-                            id="status"
-                            value={form.status}
-                            onChange={(event) => setForm({ ...form, status: event.target.value })}
-                            className={inputClass}
-                        >
-                            <option value="">Semua status</option>
-                            {statuses.map((status) => (
-                                <option key={status.value} value={status.value}>{status.label}</option>
-                            ))}
-                        </select>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                        <button type="submit" className={btnPrimary}>Terapkan filter</button>
+                        <button type="button" onClick={resetFilters} className={btnSecondary}>Atur ulang</button>
                     </div>
-
-                    <div>
-                        <label htmlFor="unit" className={labelClass}>Unit kerja</label>
-                        <select
-                            id="unit"
-                            value={form.unit}
-                            onChange={(event) => setForm({ ...form, unit: event.target.value })}
-                            className={inputClass}
-                        >
-                            <option value="">Semua unit</option>
-                            {units.map((unit) => (
-                                <option key={unit.value} value={unit.value}>{unit.label}</option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div>
-                        <label htmlFor="pegawai" className={labelClass}>Pegawai</label>
-                        <select
-                            id="pegawai"
-                            value={form.pegawai}
-                            onChange={(event) => setForm({ ...form, pegawai: event.target.value })}
-                            className={inputClass}
-                        >
-                            <option value="">Semua pegawai</option>
-                            {employees.map((employee) => (
-                                <option key={employee.value} value={employee.value}>{employee.label}</option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div>
-                        <label htmlFor="dari" className={labelClass}>Mulai dari</label>
-                        <input
-                            id="dari"
-                            type="date"
-                            value={form.dari}
-                            onChange={(event) => setForm({ ...form, dari: event.target.value })}
-                            className={inputClass}
-                        />
-                    </div>
-
-                    <div>
-                        <label htmlFor="sampai" className={labelClass}>Sampai dengan</label>
-                        <input
-                            id="sampai"
-                            type="date"
-                            value={form.sampai}
-                            onChange={(event) => setForm({ ...form, sampai: event.target.value })}
-                            className={inputClass}
-                        />
-                    </div>
-                </div>
-
-                <div className="mt-4 flex flex-wrap gap-2">
-                    <button type="submit" className={btnPrimary}>Terapkan filter</button>
-                    <button type="button" onClick={resetFilters} className={btnSecondary}>Atur ulang</button>
-                </div>
-            </form>
+                </form>
+            </div>
 
             {trips.data.length === 0 ? (
                 <div className="rounded-md border border-dashed border-line bg-surface px-5 py-10 text-center">
@@ -201,7 +237,7 @@ export default function TripsIndex({
                             <li key={trip.id} className={`${cardClass} p-4`}>
                                 <div className="flex flex-wrap items-start justify-between gap-2">
                                     <StatusBadge status={trip.status} label={trip.status_label} />
-                                    <p className="text-xs text-muted">
+                                    <p className="text-xs text-muted tabular-nums">
                                         {formatDateShort(trip.tanggal_mulai)} - {formatDateShort(trip.tanggal_selesai)}
                                     </p>
                                 </div>
@@ -214,25 +250,32 @@ export default function TripsIndex({
                                 <p className="mt-1 text-sm text-muted">
                                     {trip.tempat_tujuan} · {trip.pegawai}
                                 </p>
-                                <p className="mt-2 text-sm text-ink">
+                                <p className="mt-2 text-sm text-ink tabular-nums">
                                     {trip.lama_hari} hari · {formatRupiah(trip.total_biaya)}
                                 </p>
-                                <p className="mt-1 text-xs text-muted">
+                                <p className="mt-1 text-xs text-muted tabular-nums">
                                     {trip.nomor_sppd ? `SPPD ${trip.nomor_sppd}` : 'Nomor SPPD belum terbit'}
                                 </p>
                             </li>
                         ))}
                     </ul>
 
-                    <div className={`${cardClass} hidden overflow-x-auto lg:block`}>
+                    <div
+                        tabIndex={0}
+                        role="region"
+                        aria-labelledby="perjalanan-caption"
+                        className={`${cardClass} relative hidden overflow-x-auto lg:block`}
+                    >
                         <table className="w-full border-collapse text-left text-sm">
-                            <caption className="sr-only">Daftar perjalanan dinas</caption>
+                            <caption id="perjalanan-caption" className="sr-only">
+                                Daftar perjalanan dinas
+                            </caption>
                             <thead>
                                 <tr className="border-b border-line text-xs uppercase tracking-wide text-muted">
                                     <th scope="col" className="px-4 py-3 font-semibold">Perjalanan</th>
                                     <th scope="col" className="px-4 py-3 font-semibold">Pegawai</th>
                                     <th scope="col" className="px-4 py-3 font-semibold">Tanggal</th>
-                                    <th scope="col" className="px-4 py-3 font-semibold">Biaya</th>
+                                    <th scope="col" className="px-4 py-3 text-right font-semibold">Biaya</th>
                                     <th scope="col" className="px-4 py-3 font-semibold">Status</th>
                                     <th scope="col" className="px-4 py-3 font-semibold">
                                         <span className="sr-only">Tindakan</span>
@@ -241,26 +284,26 @@ export default function TripsIndex({
                             </thead>
                             <tbody className="divide-y divide-line">
                                 {trips.data.map((trip) => (
-                                    <tr key={trip.id}>
+                                    <tr key={trip.id} className="transition-colors hover:bg-paper/60">
                                         <td className="px-4 py-3">
                                             <p className="font-semibold text-ink">{trip.maksud}</p>
                                             <p className="text-xs text-muted">
                                                 {trip.tempat_tujuan} · {trip.unit}
                                             </p>
-                                            <p className="text-xs text-muted">
+                                            <p className="tabular-nums text-xs text-muted">
                                                 {trip.nomor_sppd ?? 'Nomor SPPD belum terbit'}
                                             </p>
                                         </td>
                                         <td className="px-4 py-3">
                                             <p className="text-ink">{trip.pegawai}</p>
-                                            <p className="text-xs text-muted">NIP {trip.nip ?? '-'}</p>
+                                            <p className="tabular-nums text-xs text-muted">NIP {trip.nip ?? '-'}</p>
                                         </td>
-                                        <td className="px-4 py-3 text-ink">
+                                        <td className="px-4 py-3 whitespace-nowrap text-ink tabular-nums">
                                             {formatDateShort(trip.tanggal_mulai)}
                                             <br />
                                             <span className="text-xs text-muted">s.d. {formatDateShort(trip.tanggal_selesai)}</span>
                                         </td>
-                                        <td className="px-4 py-3 text-ink">{formatRupiah(trip.total_biaya)}</td>
+                                        <td className="px-4 py-3 text-right whitespace-nowrap text-ink tabular-nums">{formatRupiah(trip.total_biaya)}</td>
                                         <td className="px-4 py-3">
                                             <StatusBadge status={trip.status} label={trip.status_label} />
                                         </td>

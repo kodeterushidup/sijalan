@@ -1,5 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import AppLayout from '@/components/AppLayout';
 import Flash from '@/components/Flash';
 import PageHeader from '@/components/PageHeader';
@@ -32,12 +32,43 @@ type Option = { value: number; label: string };
 
 const weekdays = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
 
+function Chevron({ direction, className = '' }: { direction: 'left' | 'right'; className?: string }) {
+    return (
+        <svg
+            viewBox="0 0 20 20"
+            aria-hidden="true"
+            className={`size-4 shrink-0 ${className}`}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            {direction === 'left' ? <path d="M12 5l-5 5 5 5" /> : <path d="M8 5l5 5-5 5" />}
+        </svg>
+    );
+}
+
+function DayNumber({ day, isToday, dimmed = false }: { day: number; isToday: boolean; dimmed?: boolean }) {
+    return (
+        <span
+            className={`grid size-8 place-items-center rounded-sm font-display text-sm font-semibold ${
+                isToday ? 'bg-accent text-white' : dimmed ? 'text-muted' : 'text-ink'
+            }`}
+        >
+            {day}
+        </span>
+    );
+}
+
 const legend: { status: TripStatus; label: string }[] = [
     { status: 'draft', label: 'Draft' },
     { status: 'diajukan', label: 'Menunggu Persetujuan' },
     { status: 'disetujui', label: 'Disetujui' },
     { status: 'berlangsung', label: 'Berlangsung' },
     { status: 'selesai', label: 'Selesai' },
+    { status: 'ditolak', label: 'Ditolak' },
+    { status: 'dibatalkan', label: 'Dibatalkan' },
 ];
 
 export default function CalendarIndex({
@@ -104,6 +135,23 @@ export default function CalendarIndex({
     const monthEnd = new Date(Date.UTC(year, month, 0)).toISOString().slice(0, 10);
     const monthTrips = trips.filter((trip) => trip.tanggal_mulai <= monthEnd && trip.tanggal_selesai >= monthStart);
 
+    const entriesByDay = useMemo(() => {
+        const byDate = new Map<string, TripEntry[]>();
+
+        for (const day of days) {
+            if (!day.in_month) {
+                continue;
+            }
+
+            byDate.set(
+                day.date,
+                trips.filter((trip) => trip.tanggal_mulai <= day.date && trip.tanggal_selesai >= day.date),
+            );
+        }
+
+        return byDate;
+    }, [days, trips]);
+
     return (
         <AppLayout>
             <Head title="Kalender perjalanan" />
@@ -126,16 +174,18 @@ export default function CalendarIndex({
 
             <div className={`${cardClass} mb-4 flex flex-wrap items-center justify-between gap-3 p-4`}>
                 <div className="flex flex-wrap items-center gap-2">
-                    <Link href={href(prev)} className={btnSecondary} aria-label="Bulan sebelumnya">
-                        ← Sebelumnya
+                    <Link href={href(prev)} className={`${btnSecondary} max-sm:px-3`} aria-label="Bulan sebelumnya">
+                        <Chevron direction="left" className="max-sm:hidden" />
+                        Sebelumnya
                     </Link>
-                    <p className="min-w-40 text-center font-display text-2xl capitalize text-ink" aria-live="polite">
+                    <p className="order-first w-full text-center font-display text-2xl text-ink capitalize sm:order-none sm:w-auto sm:min-w-40" aria-live="polite">
                         {bulanLabel}
                     </p>
-                    <Link href={href(next)} className={btnSecondary} aria-label="Bulan berikutnya">
-                        Berikutnya →
+                    <Link href={href(next)} className={`${btnSecondary} max-sm:px-3`} aria-label="Bulan berikutnya">
+                        Berikutnya
+                        <Chevron direction="right" className="max-sm:hidden" />
                     </Link>
-                    <Link href={href(today)} className={btnSecondary}>
+                    <Link href={href(today)} className={`${btnSecondary} max-sm:px-3`}>
                         Hari ini
                     </Link>
                 </div>
@@ -176,90 +226,88 @@ export default function CalendarIndex({
                 ) : null}
             </div>
 
-            <div className={`${cardClass} overflow-x-auto`}>
-                <table className="w-full min-w-[760px] border-collapse">
-                    <caption className="sr-only">Kalender perjalanan dinas {bulanLabel}</caption>
-                    <thead>
-                        <tr>
-                            {weekdays.map((weekday) => (
-                                <th
-                                    key={weekday}
-                                    scope="col"
-                                    className="border-b border-line bg-paper px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-muted"
-                                >
-                                    {weekday}
-                                </th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {Array.from({ length: 6 }, (_, row) => (
-                            <tr key={row}>
-                                {days.slice(row * 7, row * 7 + 7).map((day) => {
-                                    const entries = trips.filter(
-                                        (trip) => trip.tanggal_mulai <= day.date && trip.tanggal_selesai >= day.date,
-                                    );
-
-                                    return (
-                                        <td
-                                            key={day.date}
-                                            className={`h-28 border-b border-r border-line align-top p-1.5 ${
-                                                day.in_month ? 'bg-surface' : 'bg-paper/50'
-                                            }`}
-                                        >
-                                            <div className="flex items-center justify-between">
-                                                {canCreate && day.in_month ? (
-                                                    <Link
-                                                        href={`/perjalanan/baru?tanggal=${day.date}`}
-                                                        className={`inline-flex min-h-11 min-w-11 items-center justify-center rounded-sm text-xs font-semibold transition-colors hover:bg-paper ${
-                                                            day.is_today
-                                                                ? 'bg-accent text-white'
-                                                                : day.in_month
-                                                                  ? 'text-ink'
-                                                                  : 'text-muted'
-                                                        }`}
-                                                        aria-label={`Buat perjalanan pada ${formatDateShort(day.date)}`}
-                                                    >
-                                                        {day.day}
-                                                    </Link>
-                                                ) : (
-                                                    <span
-                                                        className={`inline-flex min-h-11 min-w-11 items-center justify-center rounded-sm text-xs font-semibold ${
-                                                            day.is_today
-                                                                ? 'bg-accent text-white'
-                                                                : day.in_month
-                                                                  ? 'text-ink'
-                                                                  : 'text-muted'
-                                                        }`}
-                                                    >
-                                                        {day.day}
-                                                    </span>
-                                                )}
-                                            </div>
-
-                                            <ul className="mt-1 space-y-1">
-                                                {entries.map((trip) => (
-                                                    <li key={trip.id}>
-                                                        <Link
-                                                            href={`/perjalanan/${trip.id}`}
-                                                            title={`${trip.maksud} · ${trip.pegawai}`}
-                                                            className={`block truncate rounded-sm border px-1.5 py-0.5 text-[11px] font-semibold ${statusStyles[trip.status]}`}
-                                                        >
-                                                            {trip.maksud}
-                                                            <span className="sr-only">
-                                                                {' '}oleh {trip.pegawai}, status {trip.status_label}
-                                                            </span>
-                                                        </Link>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </td>
-                                    );
-                                })}
+            <div className={`${cardClass} overflow-hidden`}>
+                <div
+                    tabIndex={0}
+                    role="region"
+                    aria-labelledby="kalender-caption"
+                    className="relative overflow-x-auto"
+                >
+                    <table className="w-full min-w-[720px] table-fixed border-collapse">
+                        <caption id="kalender-caption" className="sr-only">
+                            Kalender perjalanan dinas {bulanLabel}
+                        </caption>
+                        <thead>
+                            <tr>
+                                {weekdays.map((weekday) => (
+                                    <th
+                                        key={weekday}
+                                        scope="col"
+                                        className="border-b border-line bg-paper px-2 py-2 text-left text-xs font-semibold tracking-wide text-muted uppercase"
+                                    >
+                                        {weekday}
+                                    </th>
+                                ))}
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {Array.from({ length: 6 }, (_, row) => (
+                                <tr key={row}>
+                                    {days.slice(row * 7, row * 7 + 7).map((day, column) => {
+                                        const entries = entriesByDay.get(day.date) ?? [];
+                                        const isWeekend = column >= 5;
+
+                                        return (
+                                            <td
+                                                key={day.date}
+                                                className={`h-24 min-w-0 border-r border-b border-line p-1.5 align-top ${
+                                                    day.in_month
+                                                        ? isWeekend
+                                                            ? 'bg-paper/60'
+                                                            : 'bg-surface'
+                                                        : 'bg-paper/40'
+                                                }`}
+                                            >
+                                                <div className="flex items-center justify-between">
+                                                    {canCreate && day.in_month ? (
+                                                        <Link
+                                                            href={`/perjalanan/baru?tanggal=${day.date}`}
+                                                            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-sm transition-colors hover:bg-paper"
+                                                            aria-label={`Buat perjalanan pada ${formatDateShort(day.date)}`}
+                                                        >
+                                                            <DayNumber day={day.day} isToday={day.is_today} dimmed={!day.in_month} />
+                                                        </Link>
+                                                    ) : (
+                                                        <span className="inline-flex min-h-11 min-w-11 items-center justify-center">
+                                                            <DayNumber day={day.day} isToday={day.is_today} dimmed={!day.in_month} />
+                                                        </span>
+                                                    )}
+                                                </div>
+
+                                                <ul className="space-y-1">
+                                                    {entries.map((trip) => (
+                                                        <li key={trip.id}>
+                                                            <Link
+                                                                href={`/perjalanan/${trip.id}`}
+                                                                title={`${trip.maksud} · ${trip.pegawai}`}
+                                                                className={`block truncate rounded-sm border px-1.5 py-0.5 text-[11px] font-semibold ${statusStyles[trip.status]}`}
+                                                            >
+                                                                {trip.maksud}
+                                                                <span className="sr-only">
+                                                                    {' '}oleh {trip.pegawai}, status {trip.status_label}
+                                                                </span>
+                                                            </Link>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </td>
+                                        );
+                                    })}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">

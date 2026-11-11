@@ -45,9 +45,16 @@ export default function UnitsIndex({ units }: { units: Unit[] }) {
             />
 
             <div className="grid gap-4 lg:grid-cols-[1fr_20rem]">
-                <div className={`${cardClass} overflow-x-auto`}>
+                <div
+                    tabIndex={0}
+                    role="region"
+                    aria-labelledby="unit-caption"
+                    className={`${cardClass} relative overflow-x-auto`}
+                >
                     <table className="w-full min-w-[34rem] border-collapse text-left text-sm">
-                        <caption className="sr-only">Daftar unit kerja</caption>
+                        <caption id="unit-caption" className="sr-only">
+                            Daftar unit kerja
+                        </caption>
                         <thead>
                             <tr className="border-b border-line text-xs uppercase tracking-wide text-muted">
                                 <th scope="col" className="px-4 py-3 font-semibold">Kode</th>
@@ -61,13 +68,13 @@ export default function UnitsIndex({ units }: { units: Unit[] }) {
                         </thead>
                         <tbody className="divide-y divide-line">
                             {units.map((unit) => (
-                                <tr key={unit.id}>
-                                    <td className="px-4 py-3 font-semibold text-ink">{unit.kode}</td>
+                                <tr key={unit.id} className="transition-colors hover:bg-paper/60">
+                                    <td className="px-4 py-3 font-semibold text-ink whitespace-nowrap">{unit.kode}</td>
                                     <td className="px-4 py-3 text-ink">{unit.nama}</td>
-                                    <td className="px-4 py-3 text-muted">{unit.users_count}</td>
-                                    <td className="px-4 py-3 text-muted">{unit.trips_count}</td>
+                                    <td className="px-4 py-3 text-muted tabular-nums">{unit.users_count}</td>
+                                    <td className="px-4 py-3 text-muted tabular-nums">{unit.trips_count}</td>
                                     <td className="px-4 py-3">
-                                        <div className="flex flex-wrap justify-end gap-2">
+                                        <div className="flex justify-end gap-2">
                                             <Link
                                                 href={`/unit/${unit.id}/edit`}
                                                 className="inline-flex min-h-11 items-center rounded-sm px-2 text-sm font-semibold text-accent underline underline-offset-2"

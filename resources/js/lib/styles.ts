@@ -11,7 +11,7 @@ export const btnDanger =
     'inline-flex min-h-11 items-center justify-center gap-2 rounded-sm border border-danger/40 bg-danger-soft px-4 py-2 text-sm font-semibold text-danger transition-colors hover:border-danger active:bg-danger/10';
 
 export const inputClass =
-    'min-h-11 w-full rounded-sm border border-line bg-white px-3 py-2 text-sm text-ink outline-none transition-colors placeholder:text-muted/70 focus:border-accent focus:ring-2 focus:ring-accent/25';
+    'min-h-11 w-full rounded-sm border border-line bg-white px-3 py-2 text-sm text-ink transition-colors placeholder:text-muted focus:border-accent';
 
 export const labelClass = 'mb-1.5 block text-sm font-medium text-ink';
 

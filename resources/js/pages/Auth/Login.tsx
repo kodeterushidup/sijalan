@@ -32,23 +32,24 @@ export default function Login({ demoAccounts }: { demoAccounts: DemoAccount[] })
         <div className="grid min-h-dvh lg:grid-cols-[1.05fr_1fr]">
             <Head title="Masuk" />
 
-            <section className="hidden flex-col justify-between bg-ink p-10 lg:flex lg:p-14">
-                <div>
-                    <p className="font-display text-3xl leading-none tracking-wide text-white">SIJALAN</p>
-                    <p className="mt-1 text-sm text-white/70">Sistem Perjalanan Dinas</p>
-                </div>
+            <section className="login-brand hidden flex-col justify-between p-10 lg:flex lg:p-14">
+                <header>
+                    <p className="font-display text-4xl leading-none tracking-wide text-white">SIJALAN</p>
+                    <p className="mt-2 text-sm text-white/70">Sistem Perjalanan Dinas</p>
+                    <span className="login-brand-rule" aria-hidden="true" />
+                </header>
 
-                <div className="max-w-lg">
-                    <p className="font-display text-5xl leading-tight text-white">
+                <div className="max-w-136">
+                    <p className="login-brand-title font-display text-white">
                         Perjalanan dinas, SPPD, dan laporan dalam satu arsip.
                     </p>
-                    <p className="mt-5 text-sm leading-relaxed text-white/75">
+                    <p className="login-brand-sub mt-6 text-sm leading-relaxed text-white/75">
                         Kalender perjalanan per pegawai dan unit, penomoran surat yang konsisten, serta
                         kelengkapan laporan dan dokumentasi setelah perjalanan.
                     </p>
                 </div>
 
-                <p className="text-xs text-white/60">Akses hanya untuk pegawai yang terdaftar.</p>
+                <p className="login-brand-foot text-xs text-white/60">Akses hanya untuk pegawai yang terdaftar.</p>
             </section>
 
             <main className="flex items-center justify-center px-4 py-10 sm:px-8">

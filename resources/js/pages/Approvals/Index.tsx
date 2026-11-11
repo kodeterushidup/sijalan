@@ -64,9 +64,16 @@ export default function ApprovalsIndex({ trips }: { trips: Paginated<ApprovalRow
                         ))}
                     </ul>
 
-                    <div className={`${cardClass} hidden overflow-x-auto lg:block`}>
+                    <div
+                        tabIndex={0}
+                        role="region"
+                        aria-labelledby="persetujuan-caption"
+                        className={`${cardClass} relative hidden overflow-x-auto lg:block`}
+                    >
                         <table className="w-full border-collapse text-left text-sm">
-                            <caption className="sr-only">Perjalanan yang menunggu persetujuan</caption>
+                            <caption id="persetujuan-caption" className="sr-only">
+                                Perjalanan yang menunggu persetujuan
+                            </caption>
                             <thead>
                                 <tr className="border-b border-line text-xs uppercase tracking-wide text-muted">
                                     <th scope="col" className="px-4 py-3 font-semibold">Diajukan</th>
@@ -81,8 +88,8 @@ export default function ApprovalsIndex({ trips }: { trips: Paginated<ApprovalRow
                             </thead>
                             <tbody className="divide-y divide-line">
                                 {trips.data.map((trip) => (
-                                    <tr key={trip.id}>
-                                        <td className="px-4 py-3 text-xs text-muted">{formatDateTime(trip.diajukan_at)}</td>
+                                    <tr key={trip.id} className="transition-colors hover:bg-paper/60">
+                                        <td className="px-4 py-3 text-xs text-muted tabular-nums">{formatDateTime(trip.diajukan_at)}</td>
                                         <td className="px-4 py-3">
                                             <p className="font-semibold text-ink">{trip.maksud}</p>
                                             <p className="text-xs text-muted">{trip.tempat_tujuan} · {trip.unit}</p>

@@ -1,4 +1,4 @@
-import { Head, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import AppLayout from '@/components/AppLayout';
 import EmptyState from '@/components/EmptyState';
 import Flash from '@/components/Flash';
@@ -32,6 +32,13 @@ type UnitTotal = {
     total: number;
 };
 
+const todayLabel = new Intl.DateTimeFormat('id-ID', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+});
+
 export default function Dashboard({
     stats,
     upcoming,
@@ -63,12 +70,13 @@ export default function Dashboard({
         { label: 'Berkas belum lengkap', value: stats.belum_lengkap },
     ];
 
-    const today = new Intl.DateTimeFormat('id-ID', {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-    }).format(new Date());
+    const focalHref = isPegawai
+        ? '/perjalanan'
+        : user?.role === 'pejabat'
+          ? '/persetujuan'
+          : '/perjalanan?status=diajukan';
+
+    const today = todayLabel.format(new Date());
 
     const maxUnitTotal = Math.max(1, ...unitChart.map((unit) => unit.total));
 
@@ -79,17 +87,31 @@ export default function Dashboard({
             <PageHeader title="Ringkasan" description={today} />
 
             <div className="grid gap-4 md:grid-cols-[1.1fr_1fr]">
-                <section className="flex flex-col justify-between rounded-md bg-ink p-6 text-white">
-                    <p className="text-sm font-medium text-accent-soft">{focal.label}</p>
-                    <p className="font-display text-7xl leading-none">{focal.value}</p>
-                    <p className="max-w-sm text-sm text-white/70">{focal.note}</p>
-                </section>
+                <Link href={focalHref} className="stat-focal">
+                    <div className="stat-focal-top">
+                        <p className="stat-focal-figure">{focal.value}</p>
+                        <svg
+                            viewBox="0 0 20 20"
+                            aria-hidden="true"
+                            className="stat-focal-arrow"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        >
+                            <path d="M4 10h11M11 6l4 4-4 4" />
+                        </svg>
+                    </div>
+                    <p className="stat-focal-label">{focal.label}</p>
+                    <p className="stat-focal-note">{focal.note}</p>
+                </Link>
 
                 <dl className={`${cardClass} divide-y divide-line`}>
                     {secondary.map((item) => (
                         <div key={item.label} className="flex items-baseline justify-between gap-4 px-5 py-4">
                             <dt className="text-sm text-muted">{item.label}</dt>
-                            <dd className="font-display text-3xl text-ink">{item.value}</dd>
+                            <dd className="font-display text-3xl text-ink tabular-nums">{item.value}</dd>
                         </div>
                     ))}
                 </dl>
@@ -103,7 +125,7 @@ export default function Dashboard({
                             <li key={unit.nama}>
                                 <div className="flex items-baseline justify-between gap-4 text-sm">
                                     <span className="text-ink">{unit.nama}</span>
-                                    <span className="font-semibold text-ink">{unit.total}</span>
+                                    <span className="font-semibold text-ink tabular-nums">{unit.total}</span>
                                 </div>
                                 <div
                                     className="mt-1.5 h-2 overflow-hidden rounded-sm bg-paper"

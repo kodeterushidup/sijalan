@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\DashboardController;
@@ -20,6 +21,13 @@ Route::middleware('guest')->group(function (): void {
     Route::post('/login', [LoginController::class, 'store'])
         ->middleware('throttle:6,1')
         ->name('login.store');
+
+    Route::get('/auth/google/redirect', [GoogleController::class, 'redirect'])
+        ->middleware('throttle:6,1')
+        ->name('google.redirect');
+    Route::get('/auth/google/callback', [GoogleController::class, 'callback'])
+        ->middleware('throttle:6,1')
+        ->name('google.callback');
 });
 
 Route::middleware('auth')->group(function (): void {
@@ -46,6 +54,7 @@ Route::middleware('auth')->group(function (): void {
         Route::post('/pegawai/impor', [EmployeeController::class, 'import'])->name('employees.import');
         Route::get('/pegawai/{employee}/edit', [EmployeeController::class, 'edit'])->name('employees.edit');
         Route::patch('/pegawai/{employee}', [EmployeeController::class, 'update'])->name('employees.update');
+        Route::delete('/pegawai/{employee}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
     });
 
     Route::middleware('role:super_admin')->group(function (): void {

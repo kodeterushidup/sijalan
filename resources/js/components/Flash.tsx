@@ -2,7 +2,7 @@ import { usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import type { SharedPageProps } from '@/types';
 
-export default function Flash() {
+export default function Flash({ className = 'mb-6' }: { className?: string }) {
     const { flash } = usePage<SharedPageProps>().props;
     const [dismissed, setDismissed] = useState<string[]>([]);
 
@@ -18,7 +18,7 @@ export default function Flash() {
     }
 
     return (
-        <div className="mb-6 space-y-2">
+        <div className={`${className} space-y-2`}>
             {messages.map((message) => (
                 <div
                     key={message.text}

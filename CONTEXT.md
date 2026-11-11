@@ -31,9 +31,17 @@ _Avoid_: Anggaran, budget, SPJ
 Kode atau nama pos anggaran yang membiayai satu Perjalanan Dinas.
 _Avoid_: Mata anggaran, akun belanja
 
+**Pengguna**:
+Akun yang dapat masuk ke aplikasi, dikenali dari alamat email dan memiliki satu peran.
+_Avoid_: User, akun login, member
+
 **Pegawai**:
-Orang yang tercatat sebagai pelaksana Perjalanan Dinas, memiliki NIP, jabatan, golongan, dan Unit Kerja.
+Pengguna berperan Pegawai yang data kepegawaiannya (NIP, jabatan, golongan, dan Unit Kerja) sudah lengkap serta sudah diaktifkan.
 _Avoid_: Karyawan, user, staf, personel
+
+**Aktivasi Pegawai**:
+Tindakan Admin Kepegawaian yang mengaktifkan Pengguna berperan Pegawai setelah NIP dan Unit Kerja terisi.
+_Avoid_: Verifikasi akun, approval user, aktivasi user
 
 **Unit Kerja**:
 Satuan organisasi tempat Pegawai bertugas (mis. Sekretariat, Bidang A), dipakai untuk memfilter kalender dan laporan.

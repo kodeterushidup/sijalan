@@ -25,6 +25,7 @@ class EmployeeController extends Controller
         $employees = User::query()
             ->where('role', Role::Pegawai)
             ->with('unit:id,nama')
+            ->withCount('trips')
             ->when($search !== '', function ($query) use ($search): void {
                 $query->where(fn ($query) => $query
                     ->where('name', 'like', "%{$search}%")
@@ -43,6 +44,8 @@ class EmployeeController extends Controller
                 'email' => $user->email,
                 'unit' => $user->unit?->nama,
                 'is_active' => $user->is_active,
+                'is_google_account' => $user->google_id !== null,
+                'can_delete' => $user->canBeDeleted(),
             ]);
 
         return Inertia::render('Employees/Index', [
@@ -118,6 +121,19 @@ class EmployeeController extends Controller
         $employee->save();
 
         return redirect()->route('employees.index')->with('success', 'Data pegawai diperbarui.');
+    }
+
+    public function destroy(User $employee): RedirectResponse
+    {
+        abort_unless($employee->role === Role::Pegawai, 404);
+
+        if (! $employee->canBeDeleted()) {
+            return back()->with('error', 'Akun hanya dapat dihapus selama belum pernah aktif dan belum punya perjalanan.');
+        }
+
+        $employee->delete();
+
+        return redirect()->route('employees.index')->with('success', 'Akun dihapus.');
     }
 
     public function import(Request $request): RedirectResponse

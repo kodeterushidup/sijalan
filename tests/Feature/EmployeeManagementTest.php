@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\Role;
+use App\Models\Trip;
 use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -143,5 +144,105 @@ class EmployeeManagementTest extends TestCase
                 'file' => UploadedFile::fake()->create('pegawai.pdf', 100, 'application/pdf'),
             ])
             ->assertSessionHasErrors('file');
+    }
+
+    public function test_index_marks_an_unactivated_google_account_for_cleanup(): void
+    {
+        User::factory()->googlePending()->create(['name' => 'Akun Google']);
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->get('/pegawai')
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->component('Employees/Index')
+                ->where('employees.data.0.is_active', false)
+                ->where('employees.data.0.is_google_account', true)
+                ->where('employees.data.0.can_delete', true));
+    }
+
+    public function test_activation_requires_nip_and_unit(): void
+    {
+        $employee = User::factory()->googlePending()->create();
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->patch("/pegawai/{$employee->id}", [
+                'name' => $employee->name,
+                'nip' => '',
+                'unit_id' => '',
+                'email' => $employee->email,
+                'is_active' => true,
+            ])
+            ->assertSessionHasErrors(['nip', 'unit_id']);
+
+        $this->assertFalse($employee->refresh()->is_active);
+    }
+
+    public function test_admin_can_activate_an_employee_with_nip_and_unit(): void
+    {
+        $unit = Unit::factory()->create();
+        $employee = User::factory()->googlePending()->create();
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->patch("/pegawai/{$employee->id}", [
+                'name' => $employee->name,
+                'nip' => '199001012020011001',
+                'unit_id' => $unit->id,
+                'email' => $employee->email,
+                'is_active' => true,
+            ])
+            ->assertRedirect('/pegawai');
+
+        $employee->refresh();
+
+        $this->assertTrue($employee->is_active);
+        $this->assertSame('199001012020011001', $employee->nip);
+    }
+
+    public function test_admin_can_delete_an_account_that_was_never_activated(): void
+    {
+        $employee = User::factory()->googlePending()->create();
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->delete("/pegawai/{$employee->id}")
+            ->assertRedirect('/pegawai');
+
+        $this->assertModelMissing($employee);
+    }
+
+    public function test_admin_cannot_delete_an_active_employee(): void
+    {
+        $employee = User::factory()->create();
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->delete("/pegawai/{$employee->id}")
+            ->assertRedirect()
+            ->assertSessionHas('error');
+
+        $this->assertModelExists($employee);
+    }
+
+    public function test_admin_cannot_delete_an_employee_with_trips(): void
+    {
+        $employee = User::factory()->googlePending()->create();
+        $trip = Trip::factory()->create(['user_id' => $employee->id]);
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->delete("/pegawai/{$employee->id}")
+            ->assertRedirect()
+            ->assertSessionHas('error');
+
+        $this->assertModelExists($employee);
+        $this->assertModelExists($trip);
+    }
+
+    public function test_pegawai_cannot_delete_an_account(): void
+    {
+        $employee = User::factory()->googlePending()->create();
+
+        $this->actingAs(User::factory()->create())
+            ->delete("/pegawai/{$employee->id}")
+            ->assertForbidden();
+
+        $this->assertModelExists($employee);
     }
 }

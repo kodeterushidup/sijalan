@@ -47,6 +47,46 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
     }
 
+    public function test_google_only_account_is_told_to_use_google(): void
+    {
+        config([
+            'services.google.client_id' => 'test-client-id',
+            'services.google.client_secret' => 'test-client-secret',
+            'services.google.redirect' => 'http://localhost/auth/google/callback',
+        ]);
+
+        User::factory()->googlePending()->create(['email' => 'googleonly@example.test']);
+
+        $this->post('/login', [
+            'email' => 'googleonly@example.test',
+            'password' => 'apa-saja',
+        ])->assertSessionHasErrors([
+            'email' => 'Akun ini masuk dengan Google. Gunakan tombol Masuk dengan Google.',
+        ]);
+
+        $this->assertGuest();
+    }
+
+    public function test_google_only_account_gets_generic_message_when_google_is_disabled(): void
+    {
+        config([
+            'services.google.client_id' => null,
+            'services.google.client_secret' => null,
+            'services.google.redirect' => null,
+        ]);
+
+        User::factory()->googlePending()->create(['email' => 'googleonly@example.test']);
+
+        $this->post('/login', [
+            'email' => 'googleonly@example.test',
+            'password' => 'apa-saja',
+        ])->assertSessionHasErrors([
+            'email' => 'Akun tidak ditemukan atau sudah dinonaktifkan.',
+        ]);
+
+        $this->assertGuest();
+    }
+
     public function test_user_can_logout(): void
     {
         $this->actingAs(User::factory()->create());

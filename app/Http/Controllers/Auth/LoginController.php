@@ -21,6 +21,7 @@ class LoginController extends Controller
                 ['role' => 'Pejabat', 'email' => 'pejabat@sijalan.test'],
                 ['role' => 'Pegawai', 'email' => 'pegawai@sijalan.test'],
             ] : [],
+            'googleEnabled' => GoogleController::isConfigured(),
         ]);
     }
 
@@ -32,6 +33,12 @@ class LoginController extends Controller
         ]);
 
         $user = User::query()->where('email', $credentials['email'])->first();
+
+        if ($user !== null && $user->password === null && GoogleController::isConfigured()) {
+            throw ValidationException::withMessages([
+                'email' => 'Akun ini masuk dengan Google. Gunakan tombol Masuk dengan Google.',
+            ]);
+        }
 
         if (! $user || ! $user->is_active) {
             throw ValidationException::withMessages([

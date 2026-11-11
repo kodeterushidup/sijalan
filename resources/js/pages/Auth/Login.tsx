@@ -1,12 +1,14 @@
 import { Head, useForm } from '@inertiajs/react';
-import { errorClass, inputClass, labelClass, btnPrimary } from '@/lib/styles';
+import Flash from '@/components/Flash';
+import PatternWaves from '@/components/PatternWaves';
+import { errorClass, inputClass, labelClass, btnPrimary, btnSecondary } from '@/lib/styles';
 
 type DemoAccount = {
     role: string;
     email: string;
 };
 
-export default function Login({ demoAccounts }: { demoAccounts: DemoAccount[] }) {
+export default function Login({ demoAccounts, googleEnabled }: { demoAccounts: DemoAccount[]; googleEnabled: boolean }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
         password: '',
@@ -32,14 +34,34 @@ export default function Login({ demoAccounts }: { demoAccounts: DemoAccount[] })
         <div className="grid min-h-dvh lg:grid-cols-[1.05fr_1fr]">
             <Head title="Masuk" />
 
-            <section className="login-brand hidden flex-col justify-between p-10 lg:flex lg:p-14">
-                <header>
+            <section className="login-brand relative isolate hidden flex-col justify-between overflow-hidden p-10 lg:flex lg:p-14">
+                <PatternWaves
+                    className="login-waves"
+                    preset="silk"
+                    color="#f0e2b7"
+                    backgroundColor="transparent"
+                    opacity={0.28}
+                    spacing={10}
+                    markSize={0.82}
+                    depth={0.8}
+                    shine={0.5}
+                    contrast={1.15}
+                    speed={0.22}
+                    scale={1.1}
+                    fade="edges"
+                    fadeSize={0.62}
+                    interactive
+                    cursorSize={64}
+                    cursorStrength={0.35}
+                />
+
+                <header className="relative z-10">
                     <p className="font-display text-4xl leading-none tracking-wide text-white">SIJALAN</p>
                     <p className="mt-2 text-sm text-white/70">Sistem Perjalanan Dinas</p>
                     <span className="login-brand-rule" aria-hidden="true" />
                 </header>
 
-                <div className="max-w-136">
+                <div className="relative z-10 max-w-136">
                     <p className="login-brand-title font-display text-white">
                         Perjalanan dinas, SPPD, dan laporan dalam satu arsip.
                     </p>
@@ -49,7 +71,9 @@ export default function Login({ demoAccounts }: { demoAccounts: DemoAccount[] })
                     </p>
                 </div>
 
-                <p className="login-brand-foot text-xs text-white/60">Akses hanya untuk pegawai yang terdaftar.</p>
+                <p className="login-brand-foot relative z-10 text-xs text-white/60">
+                    Akun Google baru aktif setelah Admin Kepegawaian melengkapinya.
+                </p>
             </section>
 
             <main className="flex items-center justify-center px-4 py-10 sm:px-8">
@@ -61,8 +85,10 @@ export default function Login({ demoAccounts }: { demoAccounts: DemoAccount[] })
 
                     <h1 className="font-display text-4xl text-ink">Masuk</h1>
                     <p className="mt-1 text-sm text-muted">
-                        Gunakan email dan kata sandi yang diberikan Admin Kepegawaian.
+                        Masuk dengan akun Google, atau pakai email dan kata sandi dari Admin Kepegawaian.
                     </p>
+
+                    <Flash className="mt-6" />
 
                     <form onSubmit={submit} className="mt-8 space-y-5">
                         <div>
@@ -125,6 +151,19 @@ export default function Login({ demoAccounts }: { demoAccounts: DemoAccount[] })
                             {processing ? 'Memeriksa...' : 'Masuk'}
                         </button>
                     </form>
+
+                    {googleEnabled ? (
+                        <div className="mt-6">
+                            <div className="flex items-center gap-3" aria-hidden="true">
+                                <span className="h-px flex-1 bg-line" />
+                                <span className="text-xs font-medium tracking-wide text-muted">atau</span>
+                                <span className="h-px flex-1 bg-line" />
+                            </div>
+                            <a href="/auth/google/redirect" className={`${btnSecondary} mt-4 w-full`}>
+                                Masuk dengan Google
+                            </a>
+                        </div>
+                    ) : null}
 
                     {demoAccounts.length > 0 ? (
                         <div className="mt-8 rounded-md border border-line bg-surface p-4">

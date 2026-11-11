@@ -4,7 +4,7 @@ import AppLayout from '@/components/AppLayout';
 import Flash from '@/components/Flash';
 import PageHeader from '@/components/PageHeader';
 import Pagination from '@/components/Pagination';
-import { btnPrimary, btnSecondary, cardClass, errorClass, inputClass, labelClass } from '@/lib/styles';
+import { btnDanger, btnPrimary, btnSecondary, cardClass, errorClass, inputClass, labelClass } from '@/lib/styles';
 import type { Paginated } from '@/types';
 
 type UnitOption = { value: number; label: string };
@@ -18,6 +18,8 @@ type Employee = {
     email: string;
     unit: string | null;
     is_active: boolean;
+    is_google_account: boolean;
+    can_delete: boolean;
 };
 
 export default function EmployeesIndex({
@@ -33,6 +35,7 @@ export default function EmployeesIndex({
 }) {
     const [query, setQuery] = useState(filters.q);
     const [unit, setUnit] = useState(filters.unit ? String(filters.unit) : '');
+    const [confirming, setConfirming] = useState<number | null>(null);
 
     const importForm = useForm<{ file: File | null }>({ file: null });
 
@@ -47,6 +50,13 @@ export default function EmployeesIndex({
             forceFormData: true,
             preserveScroll: true,
             onSuccess: () => importForm.reset(),
+        });
+    }
+
+    function destroy(employee: Employee) {
+        router.delete(`/pegawai/${employee.id}`, {
+            preserveScroll: true,
+            onFinish: () => setConfirming(null),
         });
     }
 
@@ -135,17 +145,44 @@ export default function EmployeesIndex({
                                                 : 'border-line bg-paper text-muted'
                                         }`}
                                     >
-                                        {employee.is_active ? 'Aktif' : 'Nonaktif'}
+                                        {employee.is_active
+                                            ? 'Aktif'
+                                            : employee.is_google_account && employee.nip === null
+                                              ? 'Belum aktif'
+                                              : 'Nonaktif'}
                                     </span>
                                 </td>
                                 <td className="px-4 py-3 text-right">
-                                    <Link
-                                        href={`/pegawai/${employee.id}/edit`}
-                                        className="inline-flex min-h-11 items-center rounded-sm px-2 text-sm font-semibold text-accent underline underline-offset-2"
-                                    >
-                                        Ubah
-                                        <span className="sr-only"> data {employee.name}</span>
-                                    </Link>
+                                    <div className="flex flex-wrap items-center justify-end gap-2">
+                                        <Link
+                                            href={`/pegawai/${employee.id}/edit`}
+                                            className="inline-flex min-h-11 items-center rounded-sm px-2 text-sm font-semibold text-accent underline underline-offset-2"
+                                        >
+                                            Ubah
+                                            <span className="sr-only"> data {employee.name}</span>
+                                        </Link>
+                                        {employee.can_delete ? (
+                                            confirming === employee.id ? (
+                                                <>
+                                                    <button type="button" onClick={() => destroy(employee)} className={btnDanger}>
+                                                        Yakin hapus
+                                                    </button>
+                                                    <button type="button" onClick={() => setConfirming(null)} className={btnSecondary}>
+                                                        Batal
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setConfirming(employee.id)}
+                                                    className={btnDanger}
+                                                >
+                                                    Hapus
+                                                    <span className="sr-only"> akun {employee.name}</span>
+                                                </button>
+                                            )
+                                        ) : null}
+                                    </div>
                                 </td>
                             </tr>
                         ))}

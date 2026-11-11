@@ -13,7 +13,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 #[Fillable([
-    'name', 'email', 'password', 'role', 'nip', 'jabatan', 'golongan',
+    'name', 'email', 'google_id', 'password', 'role', 'nip', 'jabatan', 'golongan',
     'unit_id', 'no_hp', 'ttd_path', 'is_active',
 ])]
 #[Hidden(['password', 'remember_token'])]
@@ -61,5 +61,14 @@ class User extends Authenticatable
             ->take(2)
             ->map(fn (string $word): string => mb_strtoupper(mb_substr($word, 0, 1)))
             ->implode('');
+    }
+
+    public function canBeDeleted(): bool
+    {
+        if ($this->is_active || $this->nip !== null) {
+            return false;
+        }
+
+        return (int) ($this->trips_count ?? $this->trips()->count()) === 0;
     }
 }

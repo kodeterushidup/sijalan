@@ -71,6 +71,17 @@ class UserFactory extends Factory
         return $this->state(fn (): array => ['is_active' => false]);
     }
 
+    public function googlePending(): static
+    {
+        return $this->state(fn (): array => [
+            'nip' => null,
+            'unit_id' => null,
+            'password' => null,
+            'is_active' => false,
+            'google_id' => fake()->uuid(),
+        ]);
+    }
+
     public function withUnit(?Unit $unit = null): static
     {
         return $this->state(fn (): array => [
